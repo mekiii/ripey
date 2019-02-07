@@ -3,8 +3,9 @@ var express = require('express');
 var request = require('request');
 var bodyParser = require('body-parser');
 var app = express();
-const fetch = require('node-fetch');
 const fs = require('fs');
+var shuffleNumber = 1;
+
 
 
 //Declare some variables
@@ -14,7 +15,7 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 //Get slackclient
 const { WebClient } = require('@slack/client');
 // An access token (from your Slack app or custom integration - xoxa, xoxp, or xoxb)
-const token = "xoxb-447711350823-540306733076-QKJMwhz2V0qBTWuzeEXKaVXB";
+const token = "xoxb-447711350823-540306733076-3ONQkwZk96LKgZMEGQjDnyi5";
 const web = new WebClient(token);
 // This argument can be a channel ID, a DM ID, a MPDM ID, or a group ID
 const conversationId = 'CFXFT82NB';
@@ -34,7 +35,7 @@ const ripenessNotification = {
                       name: "action",
                       type: "button",
                       text: "Ja, gerne",
-                      value: "complete"
+                      value: "shuffle"
                   },
               ]
           }
@@ -48,9 +49,10 @@ const ripenessNotification = {
     }
     content = data.toString('utf8');
     myRecipes = JSON.parse(content);
-
+    console.log(myRecipes.length);
 });
-/*
+//console.log(myRecipes.length);
+ /*
 function loadJSON (jsonPath){
   var myContent;
   fs.readFile(jsonPath , function read(err, data) {
@@ -60,12 +62,13 @@ function loadJSON (jsonPath){
     content = data.toString('utf8');
     myContent = JSON.parse(content);
   });
-  console.log(myContent);
-  return myContent
+  return myContent;
 }
 var recipePath = './recipes.json';
 var myRecipes = loadJSON(recipePath);
+console.log(myRecipes);
 */
+
 
 //First post ripeness notification
 web.chat.postMessage({ channel: conversationId, text: ripenessNotification.text, attachments: ripenessNotification.attachments })
@@ -76,23 +79,6 @@ web.chat.postMessage({ channel: conversationId, text: ripenessNotification.text,
   })
   .catch(console.error);
 
-  function sendMessageToSlackResponseURL(responseURL, JSONmessage){
-    var postOptions = {
-        uri: responseURL,
-        method: 'POST',
-        headers: {
-            'Content-type': 'application/json'
-        },
-        json: JSONmessage
-    }
-    request(postOptions, (error, response, body) => {
-      console.log("RESPONSO:");
-        if (error){
-            // handle errors as you see fit
-        }
-    })
-  }
-
 
 // Start server on port 3000
 app.listen(3000, function () {
@@ -101,26 +87,30 @@ app.listen(3000, function () {
 
 //Post messages when server receives request
 app.post('/', urlencodedParser, (req, res) =>{
-  console.log("MEGA HALLO! I CUT SOME SLACK HERE MF");
+  console.log("###########################################################");
   res.status(200).end() // best practice to respond with empty 200 status code
   var reqBody = req.body;
   var responseURL = JSON.parse(reqBody.payload).response_url;
   var actions = JSON.parse(reqBody.payload).actions;
+  var message;
 
   switch(actions[0].value){
     case "shuffle":
-    web.chat.update({ channel: conversationId, text: myRecipes[1].text, attachments: myRecipes[1].attachments, ts: timeStamp })
+    // Shuffle recipes
+    shuffleNumber = (shuffleNumber + 1) % myRecipes.length;
+    message = myRecipes[shuffleNumber];
+    break;
+    case "select":
+    break;
+    case "quit":
+    message = ripenessNotification;
+  }
+  web.chat.update({ channel: conversationId, text: message.text, attachments: message.attachments, ts: timeStamp })
   .then((res) => {
     // `res` contains information about the posted message
     console.log('Message sent: ', res.ts);
   })
   .catch(console.error);
-    break;
-    case "select":
-    break;
-    case "cancel":
-    break;
-  }
-  sendMessageToSlackResponseURL(responseURL, myRecipes[0])
+
 });
 
