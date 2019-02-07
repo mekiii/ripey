@@ -1,0 +1,32 @@
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.errorCodes = undefined;
+exports.createMessageAdapter = createMessageAdapter;
+
+var _adapter = require('./adapter');
+
+/**
+ * Dictionary of error codes that may appear on errors emitted from this package's objects
+ * @readonly
+ * @enum {string}
+ */
+var errorCodes = exports.errorCodes = _adapter.errorCodes;
+
+/**
+ * Factory method to create an instance of {@link module:adapter~SlackMessageAdapter}
+ *
+ * @param {string} signingSecret
+ * @param {Object} options
+ * @returns {module:adapter~SlackMessageAdapter}
+ */
+/**
+ * @module @slack/interactive-messages
+ */
+function createMessageAdapter(signingSecret, options) {
+  return new _adapter.SlackMessageAdapter(signingSecret, options);
+}
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NyYy9pbmRleC5qcyJdLCJuYW1lcyI6WyJjcmVhdGVNZXNzYWdlQWRhcHRlciIsImVycm9yQ29kZXMiLCJhZGFwdGVyRXJyb3JDb2RlcyIsInNpZ25pbmdTZWNyZXQiLCJvcHRpb25zIiwiU2xhY2tNZXNzYWdlQWRhcHRlciJdLCJtYXBwaW5ncyI6Ijs7Ozs7O1FBbUJnQkEsb0IsR0FBQUEsb0I7O0FBaEJoQjs7QUFFQTs7Ozs7QUFLTyxJQUFNQyxrQ0FBYUMsbUJBQW5COztBQUVQOzs7Ozs7O0FBWkE7OztBQW1CTyxTQUFTRixvQkFBVCxDQUE4QkcsYUFBOUIsRUFBNkNDLE9BQTdDLEVBQXNEO0FBQzNELFNBQU8sSUFBSUMsNEJBQUosQ0FBd0JGLGFBQXhCLEVBQXVDQyxPQUF2QyxDQUFQO0FBQ0QiLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VzQ29udGVudCI6WyIvKipcbiAqIEBtb2R1bGUgQHNsYWNrL2ludGVyYWN0aXZlLW1lc3NhZ2VzXG4gKi9cbmltcG9ydCB7IFNsYWNrTWVzc2FnZUFkYXB0ZXIsIGVycm9yQ29kZXMgYXMgYWRhcHRlckVycm9yQ29kZXMgfSBmcm9tICcuL2FkYXB0ZXInO1xuXG4vKipcbiAqIERpY3Rpb25hcnkgb2YgZXJyb3IgY29kZXMgdGhhdCBtYXkgYXBwZWFyIG9uIGVycm9ycyBlbWl0dGVkIGZyb20gdGhpcyBwYWNrYWdlJ3Mgb2JqZWN0c1xuICogQHJlYWRvbmx5XG4gKiBAZW51bSB7c3RyaW5nfVxuICovXG5leHBvcnQgY29uc3QgZXJyb3JDb2RlcyA9IGFkYXB0ZXJFcnJvckNvZGVzO1xuXG4vKipcbiAqIEZhY3RvcnkgbWV0aG9kIHRvIGNyZWF0ZSBhbiBpbnN0YW5jZSBvZiB7QGxpbmsgbW9kdWxlOmFkYXB0ZXJ+U2xhY2tNZXNzYWdlQWRhcHRlcn1cbiAqXG4gKiBAcGFyYW0ge3N0cmluZ30gc2lnbmluZ1NlY3JldFxuICogQHBhcmFtIHtPYmplY3R9IG9wdGlvbnNcbiAqIEByZXR1cm5zIHttb2R1bGU6YWRhcHRlcn5TbGFja01lc3NhZ2VBZGFwdGVyfVxuICovXG5leHBvcnQgZnVuY3Rpb24gY3JlYXRlTWVzc2FnZUFkYXB0ZXIoc2lnbmluZ1NlY3JldCwgb3B0aW9ucykge1xuICByZXR1cm4gbmV3IFNsYWNrTWVzc2FnZUFkYXB0ZXIoc2lnbmluZ1NlY3JldCwgb3B0aW9ucyk7XG59XG4iXX0=
+//# sourceMappingURL=index.js.map
