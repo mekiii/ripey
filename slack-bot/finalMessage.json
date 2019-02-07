@@ -1,0 +1,19 @@
+{
+    "text" : "Max will mit dem reifen Gemüse mit anderen kochen, wärt ihr dabei? Wer hat Lust mitzumachen?",
+    "attachments" : [
+      {
+        "title": "Spaghetti Bolognese",
+        "color": "#764FA5",
+        "image_url": "https://cdn.apartmenttherapy.info/image/fetch/f_auto,q_auto:eco,c_fill,g_auto,w_1460/https://storage.googleapis.com/gen-atmedia/3/2018/12/39ee03d747ff0e93c946bdaaf07320e7679f0287.jpeg",
+        "callback_id": "shuffle_recipe",
+        "actions": [
+          {
+              "name": "action",
+              "type": "button",
+              "text": "Ich wäre dabei",
+              "value": "shuffle"
+          }
+        ]
+      }
+    ]
+  }

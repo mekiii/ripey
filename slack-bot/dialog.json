@@ -1,0 +1,23 @@
+{
+    "callback_id": "decide_cooking",
+    "title": "Bitte wähle aus",
+    "submit_label": "Annehmen",
+    "state": "Limo",
+    "elements": [
+        {
+            "label": "Zusammen oder alleine?",
+            "type": "select",
+            "name": "together",
+            "options": [
+              {
+                "label": "zusammen",
+                "value": "zusammen"
+              },
+              {
+                "label": "alleine",
+                "value": "alleine"
+              }
+            ]
+        }
+    ]
+}
