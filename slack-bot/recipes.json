@@ -3,27 +3,26 @@
     "text" : "Wie wäre es mit diesem Gericht?",
     "attachments" : [
       {
-        "title": "Spaghetti Bolognese",
-        "color": "#764FA5",
-        "image_url": "https://cdn.apartmenttherapy.info/image/fetch/f_auto,q_auto:eco,c_fill,g_auto,w_1460/https://storage.googleapis.com/gen-atmedia/3/2018/12/39ee03d747ff0e93c946bdaaf07320e7679f0287.jpeg",
+        "title": "Caprese Paninis",
+        "color": "#FFF",
+        "image_url": "https://i.imgur.com/9hX2iGh.jpg",
         "callback_id": "shuffle_recipe",
         "actions": [
           {
-              "name": "action",
-              "type": "button",
-              "text": "Ne, was anderes",
-              "value": "shuffle"
-          },
-          {
             "name": "action",
             "type": "button",
-            "text": "Nehm ich",
+            "text": "Nehm ich!",
             "value": "select"
         },
         {
           "name": "action",
           "type": "button",
-          "style": "danger",
+          "text": "Lieber was anderes",
+          "value": "shuffle"
+        },
+        {
+          "name": "action",
+          "type": "button",
           "text": "Doch nicht, danke",
           "value": "quit"
         }
@@ -35,27 +34,57 @@
     "text" : "Wie wäre es mit diesem Gericht?",
     "attachments" : [
       {
-        "title": "Pizza Caprese",
-        "color": "#764FA5",
-        "image_url": "https://www.daskochrezept.de/sites/default/files/styles/43l/public/rezepte/2010/3/Salat-Pizza-4bb10f98dd582.jpg",
+        "title": "Frischer Frühlingssalat",
+        "color": "#FFF",
+        "image_url": "https://i.imgur.com/5ntpPel.jpg",
         "callback_id": "shuffle_recipe",
         "actions": [
           {
-              "name": "action",
-              "type": "button",
-              "text": "Ne, was anderes",
-              "value": "shuffle"
-          },
-          {
             "name": "action",
             "type": "button",
-            "text": "Nehm ich",
+            "text": "Nehm ich!",
             "value": "select"
           },
           {
             "name": "action",
             "type": "button",
-            "style": "danger",
+            "text": "Lieber was anderes",
+            "value": "shuffle"
+          },
+          {
+            "name": "action",
+            "type": "button",
+            "text": "Doch nicht, danke",
+            "value": "quit"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "text" : "Wie wäre es mit diesem Gericht?",
+    "attachments" : [
+      {
+        "title": "Farfalle mit Basilikumpesto und Kirschtomaten",
+        "color": "#FFF",
+        "image_url": "https://i.imgur.com/kxJuKhK.jpg",
+        "callback_id": "shuffle_recipe",
+        "actions": [
+          {
+            "name": "action",
+            "type": "button",
+            "text": "Nehm ich!",
+            "value": "select"
+          },
+          {
+            "name": "action",
+            "type": "button",
+            "text": "Lieber was anderes",
+            "value": "shuffle"
+          },
+          {
+            "name": "action",
+            "type": "button",
             "text": "Doch nicht, danke",
             "value": "quit"
           }

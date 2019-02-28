@@ -1,0 +1,28 @@
+
+{
+    "text" : "Wie wäre es mit diesem Gericht?",
+    "attachments" : [
+      {
+		"text": "Frischer Frühlingssalat",
+        "title": "Möchtest du alleine oder mit anderen essen?",
+        "color": "#FFF",
+        "image_url": "https://i.imgur.com/eqMRq2z.jpg",
+        "callback_id": "decide_cooking",
+        "actions": [
+          {
+            "name": "action",
+            "type": "button",
+            "text": "Ja",
+            "value": "cook_together"
+          },
+          {
+            "name": "action",
+            "type": "button",
+            "text": "Nein",
+            "value": "cook_alone"
+          }
+        ]
+		
+      }
+    ]
+  }

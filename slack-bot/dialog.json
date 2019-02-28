@@ -1,21 +1,21 @@
 {
-    "callback_id": "decide_cooking",
-    "title": "Bitte wähle aus",
+    "callback_id": "schedule",
+    "title": "Lade Kollegen ein",
     "submit_label": "Annehmen",
     "state": "Limo",
     "elements": [
         {
-            "label": "Zusammen oder alleine?",
+            "label": "Dein Kalender schlägt heute vor",
             "type": "select",
             "name": "together",
             "options": [
               {
-                "label": "zusammen",
-                "value": "zusammen"
+                "label": "12:30",
+                "value": "12:30"
               },
               {
-                "label": "alleine",
-                "value": "alleine"
+                "label": "13:00",
+                "value": "13:30"
               }
             ]
         }
