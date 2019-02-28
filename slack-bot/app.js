@@ -3,7 +3,8 @@ var express = require('express');
 var request = require('request');
 var bodyParser = require('body-parser');
 var app = express();
-const fs = require('fs');
+var Promise = require('bluebird');
+var fs = Promise.promisifyAll(require('fs'));
 var shuffleNumber = 1;
 var trigger_id;
 
@@ -15,7 +16,7 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 //Get slackclient
 const { WebClient } = require('@slack/client');
 // An access token (from your Slack app or custom integration - xoxa, xoxp, or xoxb)
-const token = "xoxb-447711350823-540306733076-pNY2IRPFirosJkwVZOonhlke";
+const token = "xoxb-447711350823-540306733076-0QhdQcXoukM9YW17tsYtKC82";
 const web = new WebClient(token);
 // This argument can be a channel ID, a DM ID, a MPDM ID, or a group ID
 const conversationId = 'CFXFT82NB';
@@ -59,7 +60,7 @@ const ripenessNotification = {
             }
         ]
     }
-
+/*
     //Read recipes
   var myRecipes;
   fs.readFile('./recipes.json', function read(err, data) {
@@ -70,6 +71,7 @@ const ripenessNotification = {
     myRecipes = JSON.parse(content);
     console.log(myRecipes.length);
 });
+*/
 
 //Read final message js
 var finalMessage;
@@ -80,6 +82,9 @@ fs.readFile('./finalMessage.json', function read(err, data) {
   content = data.toString('utf8');
   finalMessage = JSON.parse(content);
 });
+
+
+
 
 //Read dialog js
 var dialog;
@@ -92,21 +97,26 @@ fs.readFile('./dialog.json', function read(err, data) {
 });
 
 
-/*
-function loadJSON (jsonPath){
-  fs.readFile(jsonPath , function read(err, data) {
-    if (err) {
-        throw err;
-    }
-    content = data.toString('utf8');
-    console.log("Bla : " + content);
-    return content;
-  });
-  
+
+async function loadJSON (jsonPath){
+
+  var data = await fs.readFileAsync(jsonPath);
+  data = data.toString('utf8');
+  data = JSON.parse(data);
+  return data;
 }
 var recipePath = './recipes.json';
-var myRecipes = loadJSON(recipePath);
-*/
+var myRecipes;
+
+
+(async () => {
+    try {
+        myRecipes = await loadJSON(recipePath);   
+    } catch (e) {
+        console.log(e);
+        // Deal with the fact the chain failed
+    }
+})();
 
 //First post ripeness notification
 web.chat.postMessage({ channel: conversationId, text: ripenessNotification.text, attachments: ripenessNotification.attachments })
