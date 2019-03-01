@@ -3,7 +3,7 @@
 		"type": "section",
 		"text": {
 			"type": "mrkdwn",
-			"text": "*Folgende Kollegen hätten Zeit:*"
+			"text": "Folgende Kollegen hätten Zeit:"
 		}
 	},
 	{
@@ -20,38 +20,6 @@
 				"text": "Nachricht senden"
 			},
 			"value": "invite_laura"
-		}
-	},
-	{
-		"type": "section",
-		"text": {
-			"type": "mrkdwn",
-			"text": "*Tom*"
-		},
-		"accessory": {
-			"type": "button",
-			"text": {
-				"type": "plain_text",
-				"emoji": true,
-				"text": "Nachricht senden"
-			},
-			"value": "invite_tom"
-		}
-	},
-	{
-		"type": "section",
-		"text": {
-			"type": "mrkdwn",
-			"text": "*Matze*"
-		},
-		"accessory": {
-			"type": "button",
-			"text": {
-				"type": "plain_text",
-				"emoji": true,
-				"text": "Nachricht senden"
-			},
-			"value": "invite_matze"
 		}
 	}
 ]

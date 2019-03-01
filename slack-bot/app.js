@@ -14,11 +14,12 @@ var devChannel = 'CFXFT82NB';
 
 //Declare some variables
 var timeStamp;
+var invitationTimeStamp;
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 //Get slackclient
 const { WebClient } = require('@slack/client');
-const myToken = "xoxb-447711350823-540306733076-nZPFfPCDPGFS7V4uhMEOlmKR";
+const myToken = "xoxb-447711350823-540306733076-00sTPaDBRcjtDLmI36FC0pLL";
 const web = new WebClient(myToken);
 const conversationId = meki;
 
@@ -198,16 +199,15 @@ app.listen(3000, function () {
 
 //Post messages when server receives request
 app.post('/', urlencodedParser,(req,res) =>{
-  console.log("###########################################################");
   res.status(200).end() // best practice to respond with empty 200 status code
   var reqBody = req.body;
   var actions = JSON.parse(reqBody.payload).actions;
   var trigger_id = JSON.parse(reqBody.payload).trigger_id;
   var reqToken = JSON.parse(reqBody.payload).token;
   var type = JSON.parse(reqBody.payload).type;
-
   var openDialog = false;
   var sendBlock = false;
+  var recipient = laura;
 
 //check what kind of action was triggered
   if (actions){
@@ -215,7 +215,7 @@ app.post('/', urlencodedParser,(req,res) =>{
     switch(actions[0].value){
             case "shuffle":
             // Shuffle recipes
-            item = (item + 2) % recipeArray.length;
+            item = (item + 3) % recipeArray.length;
             console.log("item index: "+ item);
             message = [];
             //Concat message
@@ -247,9 +247,10 @@ app.post('/', urlencodedParser,(req,res) =>{
             console.log("COOKING ALONE MTF!!!")
             message = [];
             message.push(eatingAlone[0]);
-            message.push(eatingAlone[item]);
             message.push(recipeArray[item]);
+            message.push(recipeArray[item + 2]);
             message.push(recipeArray[item + 1]);
+            sendBlock = true;
             break;
             case "invite_laura":
             message = [];
@@ -265,10 +266,11 @@ app.post('/', urlencodedParser,(req,res) =>{
             lauraMessage.push(recipeArray[item + 1]);
             lauraMessage.push(userInvitation[0]);
             lauraMessage.push(userInvitation[1]);
-            web.chat.postMessage({ channel: meki , text: "Hey, ich hätte Lust das hier zu kochen, bist du dabei?", blocks: lauraMessage})
+            web.chat.postMessage({ channel: recipient , text: "Hey, ich hätte Lust das hier zu kochen, bist du dabei?", blocks: lauraMessage})
             .then((res) => {
             // `res` contains information about the posted message
             console.log('Message sent to Laura: ', res.ts);
+            invitationTimeStamp = res.ts;
              })
             .catch(console.error);
             sendBlock = true;
@@ -277,9 +279,21 @@ app.post('/', urlencodedParser,(req,res) =>{
             message = [];
             //Concat message in users Channel
             message.push(chosenRecipes[item]);
+            message.push(recipeArray[item + 2]);
             message.push(chosenRecipes[item + 1]);
             message.push(lauraInvited[1]);
             sendBlock = true;
+            lauraMessage = [];
+            lauraMessage.push(recipeArray[item]);
+            lauraMessage.push(recipeArray[item + 1]);
+            lauraMessage.push(userInvitation[2]);
+            web.chat.update({ channel: recipient , text: "Super, bis gleich!", blocks: lauraMessage, ts: invitationTimeStamp})
+            .then((res) => {
+            // `res` contains information about the posted message
+            console.log('Message sent to Laura: ', res.ts);
+            
+             })
+            .catch(console.error);
             break;
         }
     }

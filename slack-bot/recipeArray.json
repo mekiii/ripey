@@ -1,38 +1,59 @@
 [
+	{
+		"type": "section",
+		"text": {
+			"type": "mrkdwn",
+			"text": "*Frischer Frühlingssalat*"
+		}
+	},
+	{
+		"type": "image",
+		"image_url": "https://i.imgur.com/5ntpPel.jpg",
+		"alt_text": "Frischer Frühlingssalat"
+	},
     {
-        "type": "section",
-        "text": {
-            "type": "mrkdwn",
-            "text": "*Frischer Frühlingssalat*"
-        }
+		"type": "section",
+		"text": {
+			"type": "mrkdwn",
+			"text": "*Zutaten* \n - 60g Walnüsse \n - 100g geriebene Karotten \n - 50g Oliven \n - 50g Zwiebeln \n - *100g angebauter Endiviensalat* \n - 20g Dressing \n \n*Rezept:* \n Bacon ipsum dolor amet kevin boudin pork belly, hamburger alcatra beef meatball chuck bacon chicken tri-tip kielbasa ribeye. Pancetta pork loin tongue, meatloaf jerky landjaeger corned beef biltong. Prosciutto short ribs pastrami, meatball chuck corned beef ham pig pork belly beef ribs capicola shank tail. Corned beef t-bone prosciutto bacon. "
+		}
+	},
+	{
+		"type": "section",
+		"text": {
+			"type": "mrkdwn",
+			"text": "*Caprese Paninis*"
+		}
+	},
+	{
+		"type": "image",
+		"image_url": "https://i.imgur.com/9hX2iGh.jpg",
+		"alt_text": "Caprese Paninis"
+	},
+    {
+		"type": "section",
+		"text": {
+			"type": "mrkdwn",
+			"text": "*Zutaten* \n - 60g Walnüsse \n - 100g geriebene Karotten \n - 50g Oliven \n - 50g Zwiebeln \n - *100g angebauter Endiviensalat* \n - 20g Dressing \n \n*Rezept:* \n Bacon ipsum dolor amet kevin boudin pork belly, hamburger alcatra beef meatball chuck bacon chicken tri-tip kielbasa ribeye. Pancetta pork loin tongue, meatloaf jerky landjaeger corned beef biltong. Prosciutto short ribs pastrami, meatball chuck corned beef ham pig pork belly beef ribs capicola shank tail. Corned beef t-bone prosciutto bacon. "
+		}
     },
+	{
+		"type": "section",
+		"text": {
+			"type": "mrkdwn",
+			"text": "*Farfalle mit Basilikumpesto und Kirschtomaten*"
+		}
+	},
+	{
+		"type": "image",
+		"image_url": "https://i.imgur.com/kxJuKhK.jpg",
+		"alt_text": "Farfalle mit Basilikumpesto und Kirschtomaten"
+	},
     {
-        "type": "image",
-        "image_url": "https://i.imgur.com/5ntpPel.jpg",
-        "alt_text": "Frischer Frühlingssalat"
-    },
-    {
-            "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": "*Caprese Paninis*"
-        }
-    },
-    {
-            "type": "image",
-            "image_url": "https://i.imgur.com/9hX2iGh.jpg",
-            "alt_text": "Caprese Paninis"
-    },
-    {
-        "type": "section",
-        "text": {
-            "type": "mrkdwn",
-            "text": "*Farfalle mit Basilikumpesto und Kirschtomaten*"
-        }
-    },
-    {
-        "type": "image",
-        "image_url": "https://i.imgur.com/kxJuKhK.jpg",
-        "alt_text": "Farfalle mit Basilikumpesto und Kirschtomaten"
+		"type": "section",
+		"text": {
+			"type": "mrkdwn",
+			"text": "*Zutaten* \n - 60g Walnüsse \n - 100g geriebene Karotten \n - 50g Oliven \n - 50g Zwiebeln \n - *100g angebauter Endiviensalat* \n - 20g Dressing \n \n*Rezept:* \n Bacon ipsum dolor amet kevin boudin pork belly, hamburger alcatra beef meatball chuck bacon chicken tri-tip kielbasa ribeye. Pancetta pork loin tongue, meatloaf jerky landjaeger corned beef biltong. Prosciutto short ribs pastrami, meatball chuck corned beef ham pig pork belly beef ribs capicola shank tail. Corned beef t-bone prosciutto bacon. "
+		}
     }
 ]

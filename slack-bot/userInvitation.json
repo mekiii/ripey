@@ -28,5 +28,12 @@
 				"value": "invitationDenied"
 			}
 		]
-	}
+    },
+    {
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": "Super freut mich, bis später :slightly_smiling_face:"
+            }
+    }
 ]
