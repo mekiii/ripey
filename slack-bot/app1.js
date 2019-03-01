@@ -5,7 +5,7 @@ var bodyParser = require('body-parser');
 var app = express();
 var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require('fs'));
-var shuffleNumber = 1;
+var item = 0;
 var trigger_id;
 
 
@@ -16,7 +16,7 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 //Get slackclient
 const { WebClient } = require('@slack/client');
 // An access token (from your Slack app or custom integration - xoxa, xoxp, or xoxb)
-const token = "xoxb-447711350823-540306733076-MtU0lpOLR8Ebl7uzUspCqeKM";
+const token = "xoxb-447711350823-540306733076-Fa8V17SpbUPEoVNlh7BC92dg";
 const web = new WebClient(token);
 // This argument can be a channel ID, a DM ID, a MPDM ID, or a group ID
 const conversationId = 'CFXFT82NB';
@@ -93,7 +93,7 @@ async function loadJSON (jsonPath){
   data = JSON.parse(data);
   return data;
 }
-var recipePath = './recipes.json';
+var recipePath = './recipes2.json';
 var myRecipes;
 
 (async () => {
@@ -127,11 +127,22 @@ var block;
     }
 })();
 
-var saladPath = "./salad.json";
-var salad;
+var recipeArrayPath = "./recipeArray.json";
+var recipeArray;
 (async () => {
     try {
-        salad = await loadJSON(saladPath);   
+        recipeArray = await loadJSON(recipeArrayPath);   
+    } catch (e) {
+        console.log(e);
+        // Deal with the fact the chain failed
+    }
+})();
+
+var chosenPath = "./chosenRecipes.json";
+var chosenRecipes;
+(async () => {
+    try {
+        chosenRecipes = await loadJSON(chosenPath);   
     } catch (e) {
         console.log(e);
         // Deal with the fact the chain failed
@@ -162,28 +173,42 @@ app.post('/', urlencodedParser, (req, res) =>{
   var trigger_id = JSON.parse(reqBody.payload).trigger_id;
   var reqToken = JSON.parse(reqBody.payload).token;
   var type = JSON.parse(reqBody.payload).type;
-  var attachments = JSON.parse(reqBody.payload).original_message.attachments;
-
   
-  console.log(JSON.parse(reqBody.payload));
+
+    //console.log(JSON.parse(reqBody.payload));
+    console.log("Get last recipe");
+    if (type == 'block_actions'){
+        console.log(JSON.parse(reqBody.payload).message.blocks[2].alt_text);
+    }
+
   console.log("###########################################################");
-  console.log(attachments[0].title);
   var message;
   var sendChatUpdate = false;
   var openDialog = false;
   var sendBlock = false;
 
+//check what kind of action was triggered
   if (actions){
     switch(actions[0].value){
             case "shuffle":
             // Shuffle recipes
-            shuffleNumber = (shuffleNumber + 1) % myRecipes.length;
-            message = myRecipes[shuffleNumber];
-            sendChatUpdate = true;
+            item = (item + 2) % recipeArray.length;
+            console.log("item index: "+ item);
+            message = [];
+            message.push(myRecipes[0]);
+            message.push(recipeArray[item]);
+            message.push(recipeArray[item + 1]);
+            message.push(myRecipes[1]);
+            sendBlock = true;
             break;
             case "select":
-            message = togetherMessage;
-            sendChatUpdate = true;
+            message = [];
+            message.push(myRecipes[0]);
+            message.push(chosenRecipes[item]);
+            message.push(chosenRecipes[item + 1]);
+            message.push(togetherMessage[0]);
+            message.push(togetherMessage[1]);
+            sendBlock = true;
             break;
             case "cook_together":
             openDialog = true;

@@ -1,0 +1,38 @@
+[
+    {
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": "*Frischer Frühlingssalat*"
+        }
+    },
+    {
+        "type": "image",
+        "image_url": "https://i.imgur.com/5ntpPel.jpg",
+        "alt_text": "Frischer Frühlingssalat"
+    },
+    {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*Caprese Paninis*"
+        }
+    },
+    {
+            "type": "image",
+            "image_url": "https://i.imgur.com/9hX2iGh.jpg",
+            "alt_text": "Caprese Paninis"
+    },
+    {
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": "*Farfalle mit Basilikumpesto und Kirschtomaten*"
+        }
+    },
+    {
+        "type": "image",
+        "image_url": "https://i.imgur.com/kxJuKhK.jpg",
+        "alt_text": "Farfalle mit Basilikumpesto und Kirschtomaten"
+    }
+]

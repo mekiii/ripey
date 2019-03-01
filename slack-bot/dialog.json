@@ -1,6 +1,6 @@
 {
     "callback_id": "schedule",
-    "title": "Lade Kollegen ein",
+    "title": "Stimmt die Uhrzeit?",
     "submit_label": "Annehmen",
     "state": "Limo",
     "elements": [

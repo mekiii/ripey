@@ -1,9 +1,9 @@
 [
-    {
+	{
 		"type": "section",
 		"text": {
 			"type": "mrkdwn",
-			"text": "Möchtest du Kollegen zum Essen einladen?"
+			"text": "Wie wäre es mit diesem Gericht?"
 		}
 	},
 	{
@@ -13,20 +13,30 @@
 				"type": "button",
 				"text": {
 					"type": "plain_text",
-					"text": "Ja",
+					"text": "Nehm ich!",
 					"emoji": true
 				},
-				"value": "cook_together"
+				"value": "select"
 			},
 			{
 				"type": "button",
 				"text": {
 					"type": "plain_text",
-					"text": "Nein",
+					"text": "Lieber was anderes",
 					"emoji": true
 				},
-				"value": "cook_alone"
+				"value": "shuffle"
+			},
+			{
+				"type": "button",
+				"text": {
+					"type": "plain_text",
+					"text": "Doch nicht, danke",
+					"emoji": true
+				},
+				"value": "quit"
 			}
 		]
 	}
+
 ]
