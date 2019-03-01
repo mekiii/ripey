@@ -6,7 +6,10 @@ var app = express();
 var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require('fs'));
 var item = 0;
-var trigger_id;
+var laura = 'DFWKPFLJH';
+var meki = 'DFW90MLUC';
+var speps = 'DFW90MKHA';
+var devChannel = 'CFXFT82NB';
 
 
 //Declare some variables
@@ -15,11 +18,9 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 //Get slackclient
 const { WebClient } = require('@slack/client');
-// An access token (from your Slack app or custom integration - xoxa, xoxp, or xoxb)
-const token = "xoxb-447711350823-540306733076-TjogbmKWTuvWA9SKhdx2OBnz";
-const web = new WebClient(token);
-// This argument can be a channel ID, a DM ID, a MPDM ID, or a group ID
-const conversationId = 'CFXFT82NB';
+const myToken = "xoxb-447711350823-540306733076-nZPFfPCDPGFS7V4uhMEOlmKR";
+const web = new WebClient(myToken);
+const conversationId = meki;
 
 
 //Read final message js
@@ -140,14 +141,35 @@ var cancelMessage;
         // Deal with the fact the chain failed
     }
 })();
+var lauraPath = "./laura_invited.json";
+var lauraInvited;
+(async () => {
+    try {
+        lauraInvited = await loadJSON(lauraPath);   
+    } catch (e) {
+        console.log(e);
+        // Deal with the fact the chain failed
+    }
+})();
+
+var userInvitationPath = "./userInvitation.json";
+var userInvitation;
+(async () => {
+    try {
+        userInvitation = await loadJSON(userInvitationPath);   
+    } catch (e) {
+        console.log(e);
+        // Deal with the fact the chain failed
+    }
+})();
+
 
 var timer = setInterval(sendNotification, 10000);
 
 
 //First post ripeness notification
-
 function sendNotification(){
-    web.chat.postMessage({ channel: conversationId, text: "Dude, you should check your block message", attachments: [], blocks: notification })
+    web.chat.postMessage({ as_user: false, channel: conversationId, text: "Hey es ist ganz viel Gemüse reif geworden! Hast du Lust auf einen Rezeptvorschlag?", attachments: [], blocks: notification })
     .then((res) => {
         // `res` contains information about the posted message
         console.log('Message sent: ', res.ts);
@@ -155,6 +177,19 @@ function sendNotification(){
     })
     .catch(console.error);
 }
+//Get Users
+var userList= [];
+web.im.list({token: myToken})
+.then((res) => {
+    console.log("###########################################################");
+    for (i = 0; i < res.ims.length; i++){
+        userList.push(res.ims[i].id);
+    }
+    console.log("User: " + userList);
+})
+.catch(console.error);
+
+
 
 // Start server on port 3000
 app.listen(3000, function () {
@@ -162,7 +197,7 @@ app.listen(3000, function () {
 });
 
 //Post messages when server receives request
-app.post('/', urlencodedParser, (req, res) =>{
+app.post('/', urlencodedParser,(req,res) =>{
   console.log("###########################################################");
   res.status(200).end() // best practice to respond with empty 200 status code
   var reqBody = req.body;
@@ -170,9 +205,7 @@ app.post('/', urlencodedParser, (req, res) =>{
   var trigger_id = JSON.parse(reqBody.payload).trigger_id;
   var reqToken = JSON.parse(reqBody.payload).token;
   var type = JSON.parse(reqBody.payload).type;
-  
-  var message;
-  var sendChatUpdate = false;
+
   var openDialog = false;
   var sendBlock = false;
 
@@ -202,21 +235,50 @@ app.post('/', urlencodedParser, (req, res) =>{
             message.push(togetherMessage[1]);
             sendBlock = true;
             break;
-            case "cook_together":
-            openDialog = true;
-            break;
             case "quit":
             item = 0;
             message = cancelMessage;
             sendBlock = true;
             break;
+            case "cook_together":
+            openDialog = true;
+            break;
             case "cook_alone":
             console.log("COOKING ALONE MTF!!!")
             message = [];
-            //Concat message
+            message.push(eatingAlone[0]);
             message.push(eatingAlone[item]);
             message.push(recipeArray[item]);
             message.push(recipeArray[item + 1]);
+            break;
+            case "invite_laura":
+            message = [];
+            //Concat message in users Channel
+            message.push(chosenRecipes[item]);
+            message.push(chosenRecipes[item + 1]);
+            message.push(invitationMessage[0]);
+            message.push(lauraInvited[0]);
+            sendBlock = true;
+            //send Laura message
+            lauraMessage = [];
+            lauraMessage.push(recipeArray[item]);
+            lauraMessage.push(recipeArray[item + 1]);
+            lauraMessage.push(userInvitation[0]);
+            lauraMessage.push(userInvitation[1]);
+            web.chat.postMessage({ channel: meki , text: "Hey, ich hätte Lust das hier zu kochen, bist du dabei?", blocks: lauraMessage})
+            .then((res) => {
+            // `res` contains information about the posted message
+            console.log('Message sent to Laura: ', res.ts);
+             })
+            .catch(console.error);
+            sendBlock = true;
+            break;
+            case "invitationAccepted":
+            message = [];
+            //Concat message in users Channel
+            message.push(chosenRecipes[item]);
+            message.push(chosenRecipes[item + 1]);
+            message.push(lauraInvited[1]);
             sendBlock = true;
             break;
         }
@@ -235,18 +297,6 @@ app.post('/', urlencodedParser, (req, res) =>{
         sendBlock = true;
 
     }
-
-    //var getList = web.conversations.list()
-    /*
-    if(sendChatUpdate) {
-        web.chat.update({ channel: conversationId, text: message.text, attachments: message.attachments, ts: timeStamp })
-        .then((res) => {
-            // `res` contains information about the posted message
-            console.log('Message sent: ', res.ts);
-        })
-        .catch(console.error);
-    }
-    */
     if(sendBlock) {
         web.chat.update({ channel: conversationId, text: "Here's a block", attachments: [], ts: timeStamp, blocks: message })
         .then((res) => {
@@ -258,5 +308,4 @@ app.post('/', urlencodedParser, (req, res) =>{
     if(openDialog){
         web.dialog.open({reqToken, dialog, trigger_id});
     }
-
-});
+})

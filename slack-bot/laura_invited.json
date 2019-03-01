@@ -1,0 +1,16 @@
+[
+    {
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": "Laura wurde eingeladen"
+        }
+    },
+    {
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": "Laura ist dabei! :carrot:"
+        }
+    }
+]
