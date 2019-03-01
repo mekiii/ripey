@@ -1,19 +1,9 @@
 [
 	{
-		"type": "image",
-		"title": {
-			"type": "plain_text",
-			"text": "Frischer Frühlingssalat",
-			"emoji": true
-		},
-		"image_url": "https://i.imgur.com/5ntpPel.jpg",
-		"alt_text": "Frischer Frühlingssalat"
-	},
-	{
 		"type": "section",
 		"text": {
 			"type": "mrkdwn",
-			"text": "Folgende Kollegen hätten Zeit"
+			"text": "*Folgende Kollegen hätten Zeit:*"
 		}
 	},
 	{

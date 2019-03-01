@@ -1,0 +1,9 @@
+[
+	{
+		"type": "section",
+		"text": {
+			"type": "mrkdwn",
+			"text": "Hier dein leckeres Rezept, viel Spaß beim Kochen!"
+		}
+    }
+]

@@ -1,0 +1,24 @@
+[
+	{
+		"type": "section",
+		"text": {
+			"type": "plain_text",
+			"text": "Hey es ist ganz viel Gemuese reif geworden! Hast du Lust auf einen Rezeptvorschlag?",
+			"emoji": true
+		}
+	},
+	{
+		"type": "actions",
+		"elements": [
+			{
+				"type": "button",
+				"text": {
+					"type": "plain_text",
+					"text": "Ja, gerne",
+					"emoji": true
+				},
+				"value": "shuffle"
+			}
+		]
+	}
+]

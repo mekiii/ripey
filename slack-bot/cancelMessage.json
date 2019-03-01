@@ -1,0 +1,23 @@
+[
+    {
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": "Schade :confused:, sag Bescheid falls du es dir anders überlegst"
+        }
+    },
+    {
+        "type": "actions",
+        "elements": [
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Vielleicht doch",
+                    "emoji": true
+                },
+                "value": "shuffle"
+            }
+        ]
+    }
+]

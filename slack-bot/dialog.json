@@ -10,12 +10,12 @@
             "name": "together",
             "options": [
               {
-                "label": "12:30",
+                "label": "Circa 12:30",
                 "value": "12:30"
               },
               {
-                "label": "13:00",
-                "value": "13:30"
+                "label": "Circa 13:00",
+                "value": "13:00"
               }
             ]
         }
