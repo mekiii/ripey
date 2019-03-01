@@ -19,7 +19,7 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 //Get slackclient
 const { WebClient } = require('@slack/client');
-const myToken = "xoxb-447711350823-540306733076-00sTPaDBRcjtDLmI36FC0pLL";
+const myToken = "xoxb-447711350823-540306733076-EU6sKBZFzNEv1jPLv8D1A3cH";
 const web = new WebClient(myToken);
 const conversationId = meki;
 
@@ -186,7 +186,6 @@ web.im.list({token: myToken})
     for (i = 0; i < res.ims.length; i++){
         userList.push(res.ims[i].id);
     }
-    console.log("User: " + userList);
 })
 .catch(console.error);
 
@@ -208,6 +207,10 @@ app.post('/', urlencodedParser,(req,res) =>{
   var openDialog = false;
   var sendBlock = false;
   var recipient = laura;
+  console.log('###################################');
+  console.log(JSON.parse(reqBody.payload));
+  var schedule;
+  
 
 //check what kind of action was triggered
   if (actions){
@@ -261,12 +264,13 @@ app.post('/', urlencodedParser,(req,res) =>{
             message.push(lauraInvited[0]);
             sendBlock = true;
             //send Laura message
+            console.log("send laura time Schedule: " + schedule);
             lauraMessage = [];
             lauraMessage.push(recipeArray[item]);
             lauraMessage.push(recipeArray[item + 1]);
             lauraMessage.push(userInvitation[0]);
             lauraMessage.push(userInvitation[1]);
-            web.chat.postMessage({ channel: recipient , text: "Hey, ich hätte Lust das hier zu kochen, bist du dabei?", blocks: lauraMessage})
+            web.chat.postMessage({as_user: false, icon_url: 'https://ca.slack-edge.com/TD5LXAAQ7-UD6KHGA93-g52a4dea3649-72', channel: recipient , text: "Hey, ich hätte Lust das hier zu kochen, bist du dabei?", blocks: lauraMessage, username: 'Meki',})
             .then((res) => {
             // `res` contains information about the posted message
             console.log('Message sent to Laura: ', res.ts);
@@ -302,9 +306,12 @@ app.post('/', urlencodedParser,(req,res) =>{
         console.log("Hello, dialog submitted");
         message = [];
         //Concat message
-        
+        schedule = JSON.parse(reqBody.payload).submission.together;
+        console.log("Schedule: " + schedule);
         message.push(chosenRecipes[item]);
         message.push(chosenRecipes[item + 1]);
+        invitationMessage[0].text.text += '*' + schedule + '* Uhr:';
+        userInvitation[0].text.text += "\n Um *" + schedule + "* Uhr würde ich anfangen."; 
         for (i=0; i < invitationMessage.length; i++){
             message.push(invitationMessage[i]);
         }
