@@ -21,7 +21,7 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 //Get slackclient
 const { WebClient } = require('@slack/client');
-const myToken = "xoxb-447711350823-540306733076-olMMPWayYzPzeo5WgjW22wXg";
+const myToken = "xoxb-447711350823-540306733076-gQXqK8SCGT3jcm5QLO7sp1v7";
 const web = new WebClient(myToken);
 const conversationId = meki;
 
