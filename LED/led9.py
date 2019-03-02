@@ -22,13 +22,13 @@ def mein_callback(channel):
     print('Es gab eine Bewegung!')
     onlyRed = 1
      
-    try:
-        GPIO.add_event_detect(SENSOR_PIN , GPIO.RISING, callback=mein_callback)
-        while True:
-            time.sleep(100)
-    except KeyboardInterrupt:
-        print "Beende..."
-    GPIO.cleanup()
+try:
+    GPIO.add_event_detect(SENSOR_PIN , GPIO.RISING, callback=mein_callback)
+    while True:
+        time.sleep(100)
+except KeyboardInterrupt:
+    print "Beende..."
+GPIO.cleanup()
 
 
 
