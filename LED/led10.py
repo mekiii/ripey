@@ -1,9 +1,6 @@
-import RPi.GPIO as GPIO
-import time
+# import RPi.GPIO as GPIO
 
-# execute terminal command and start pigpiod
-import os
-os.system("sudo pigpiod")
+
 
 # -----------------------------------------------------
 
@@ -15,8 +12,12 @@ BLUE_PIN  = 24
 # You also can use 0.X floats.
 STEPS     = 0.01
 
-###### END ######
+
+# execute terminal command and start pigpiod
 import os
+os.system("sudo pigpiod")
+
+###### END ######
 import sys
 import termios
 import tty
@@ -33,10 +34,11 @@ brightChanged = False
 abort = False
 state = True
 raiseColor = 0
-
 onlyRed = 0
 yellow = False
 test = False
+
+
 
 pi = pigpio.pi()
 
@@ -135,6 +137,9 @@ def checkKey():
 
 start_new_thread(checkKey, ())
 
+
+
+
 print ("+ / - = Increase / Decrease brightness")
 print ("p / w = Pause / weiter")
 print ("c = Abort Program")
@@ -147,15 +152,26 @@ if onlyRed == 1:
 
 
 def key_functions():
-    while abort == False and onlyRed == 0 and yellow == False and test == False:
-        if state and not brightChanged:    
-            if raiseColor == 0:
-                g = updateColor(g, +STEPS)
-                setLights(GREEN_PIN, g)
-                print ("g++")      
+    global bright
+    global brightChanged
+    global state
+    global abort
+    global onlyRed
+    global yellow
+    global test
+    global raiseColor
+    global r
+    global g
+
+#    while abort == False and onlyRed == 0 and yellow == False and test == False:
+#        if state and not brightChanged:    
+#            if raiseColor == 0:
+#                g = updateColor(g, +STEPS)
+#                setLights(GREEN_PIN, g)
+#                print ("g++")      
 
     # when r-key hit
-    while abort == False and onlyRed == 1:
+    while abort == False:
         if state and not brightChanged:
             # light go out
             if raiseColor == 0:
@@ -203,39 +219,39 @@ def key_functions():
                     raiseColor = 0
                     # print ("only r--")
                     # print ("still looping")
-                    
-    # when t-key hittet
-    if test == True:
-        # define  wanted color for red and green LED
-        r = 205
-        g = 100
-        print ("test r =" , r, "and g =", g)
-        # now set red and green LED to wanted brightness
-        setLights(RED_PIN, r)
-        setLights(GREEN_PIN, g)
-        raiseColor = 0
-        while abort == False:
-            if state and not brightChanged:
-                # make wave effect
-                
-                if raiseColor == 0:
-                    r = updateColor(r, -STEPS)
-                    setLights(RED_PIN, r)
-                    g = updateColor(g, -STEPS)
-                    setLights(GREEN_PIN, g)
-                    print ("r =", r)
-                    if g <= 5:
-                        raiseColor = 1
-                        print ("raiseColor = 1")
-
-                if raiseColor == 1:
-                    r = updateColor(r, STEPS)
-                    setLights(RED_PIN, r)
-                    print ("yellow =", r ,g)
-                    g = updateColor(g, STEPS)
-                    setLights(GREEN_PIN, g)
-                    if r >= 150:
-                        raiseColor = 0
+#                    
+#    # when t-key hittet
+#    if test == True:
+#        # define  wanted color for red and green LED
+#        r = 205
+#        g = 100
+#        print ("test r =" , r, "and g =", g)
+#        # now set red and green LED to wanted brightness
+#        setLights(RED_PIN, r)
+#        setLights(GREEN_PIN, g)
+#        raiseColor = 0
+#        while abort == False:
+#            if state and not brightChanged:
+#                # make wave effect
+#                
+#                if raiseColor == 0:
+#                    r = updateColor(r, -STEPS)
+#                    setLights(RED_PIN, r)
+#                    g = updateColor(g, -STEPS)
+#                    setLights(GREEN_PIN, g)
+#                    print ("r =", r)
+#                    if g <= 5:
+#                        raiseColor = 1
+#                        print ("raiseColor = 1")
+#
+#                if raiseColor == 1:
+#                    r = updateColor(r, STEPS)
+#                    setLights(RED_PIN, r)
+#                    print ("yellow =", r ,g)
+#                    g = updateColor(g, STEPS)
+#                    setLights(GREEN_PIN, g)
+#                    if r >= 150:
+#                        raiseColor = 0
                 
 key_functions()           
                 
@@ -249,6 +265,7 @@ setLights(GREEN_PIN, 0)
 time.sleep(0.5)
 
 pi.stop()#
+
 
 
 

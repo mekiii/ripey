@@ -1,4 +1,37 @@
-#
+import RPi.GPIO as GPIO
+import time
+
+# execute terminal command and start pigpiod
+import os
+os.system("sudo pigpiod")
+
+
+SENSOR_PIN = 23
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(SENSOR_PIN, GPIO.IN)
+
+
+
+print ("Bereit")
+onlyRed = 0
+yellow = False
+
+def mein_callback(channel):
+    # Hier kann alternativ eine Anwendung/Befehl etc. gestartet werden.
+    print('Es gab eine Bewegung!')
+    onlyRed = 1
+     
+try:
+    GPIO.add_event_detect(SENSOR_PIN , GPIO.RISING, callback=mein_callback)
+    while True:
+        time.sleep(100)
+except KeyboardInterrupt:
+    print "Beende..."
+GPIO.cleanup()
+
+
+
  # -----------------------------------------------------
  # File        fading.py
  # Authors     David Ordnung
@@ -10,7 +43,10 @@
  # 
  # This program is free software: you can redistribute it and/or modify
  # it under the terms of the GNU General Public License as published by
- # the Free Software Foundation, either version 3 of the License, or
+
+
+
+# the Free Software Foundation, either version 3 of the License, or
  # any later version.
  #  
  # This program is distributed in the hope that it will be useful,
@@ -38,7 +74,6 @@ BLUE_PIN  = 24
 STEPS     = 0.01
 
 ###### END ######
-
 import os
 import sys
 import termios
@@ -50,16 +85,18 @@ from thread import start_new_thread
 bright = 80
 r = 255.0
 g = 0.0
-onlyRed = 0
+
 
 brightChanged = False
 abort = False
 state = True
+raiseColor = 0
 
 pi = pigpio.pi()
 
 def updateColor(color, step):
     color += step
+    # print ("update color")
     
     if color > 255:
         return 255
@@ -126,12 +163,21 @@ def checkKey():
             state = True
             print ("weiter...")
             
-        if c == 'c' and not abort:
-            abort = True
-
         if c == 'r' and onlyRed == 0:
             onlyRed = 1
+            print ("onlyRed = 1")
             break
+            
+        if c == 'y':
+            yellow = True
+            print ("yellow = true")
+            break
+        
+        if c == 'c' and not abort:
+            abort = True
+            break
+
+        
 
 start_new_thread(checkKey, ())
 
@@ -144,19 +190,28 @@ print ("c = Abort Program")
 setLights(RED_PIN, r)
 setLights(GREEN_PIN, g)
 
-raiseColor = 0
+
 
 if onlyRed == 1:
     raiseColor = 0
     
-while abort == False:
+while abort == False and onlyRed == 0 and yellow == False:
     if state and not brightChanged:    
+        if raiseColor == 0:
+            g = updateColor(g, +STEPS)
+            setLights(GREEN_PIN, g)
+            print ("g++")      
+
+# when r-key hittet
+while abort == False and onlyRed == 1:
+    if state and not brightChanged:
+        # light go out
         if raiseColor == 0:
             r = updateColor(r, -STEPS)
             setLights(RED_PIN, r)
             g = updateColor(g, -STEPS)
             setLights(GREEN_PIN, g)
-            print ("r-- and g--")
+            #print ("r-- and g--")
             if r <= 5:
                 raiseColor = 1
                 print ("raiseColor = 1")
@@ -169,8 +224,30 @@ while abort == False:
                 raiseColor = 0
                 print ("only r--")
                 print ("still looping")
-                   
-                    
+                
+# when y-key hittet
+while abort == False and yellow == True:
+    if state and not brightChanged:
+        # light go out
+        if raiseColor == 0:
+            r = updateColor(r, -STEPS)
+            setLights(RED_PIN, r)
+            g = updateColor(g, -STEPS)
+            setLights(GREEN_PIN, g)
+            print ("yellow")
+            if r <= 5:
+                raiseColor = 1
+                # print ("raiseColor = 1")
+
+        if raiseColor == 1:
+            r = updateColor(r, STEPS)
+            setLights(RED_PIN, r)
+            # print ("only r++")
+            if r >= 30:
+                raiseColor = 0
+                # print ("only r--")
+                # print ("still looping")                    
+                           
             
 print ("Aborting...")
 
@@ -180,5 +257,4 @@ setLights(GREEN_PIN, 0)
 time.sleep(0.5)
 
 pi.stop()#
-
 
