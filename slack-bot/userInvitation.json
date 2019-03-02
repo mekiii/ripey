@@ -35,5 +35,12 @@
             "type": "mrkdwn",
             "text": "Super freut mich, bis später :slightly_smiling_face:"
             }
+	},
+	{
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": "Schade, vielleicht ein ander mal :slightly_frowning_face:"
+            }
     }
 ]

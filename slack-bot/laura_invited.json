@@ -12,5 +12,12 @@
             "type": "mrkdwn",
             "text": "Laura ist dabei! :carrot:"
         }
+    },
+    {
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": "Laura hat keine Zeit :no_mouth:"
+        }
     }
 ]

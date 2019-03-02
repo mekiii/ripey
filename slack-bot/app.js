@@ -19,7 +19,7 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 //Get slackclient
 const { WebClient } = require('@slack/client');
-const myToken = "xoxb-447711350823-540306733076-EU6sKBZFzNEv1jPLv8D1A3cH";
+const myToken = "xoxb-447711350823-540306733076-rQ67rYbxFJwUeNiNXFXKYBQf";
 const web = new WebClient(myToken);
 const conversationId = meki;
 
@@ -206,8 +206,9 @@ app.post('/', urlencodedParser,(req,res) =>{
   var type = JSON.parse(reqBody.payload).type;
   var openDialog = false;
   var sendBlock = false;
+  var answerUser =false;
   var recipient = laura;
-  console.log('###################################');
+  var recipientText;
   console.log(JSON.parse(reqBody.payload));
   var schedule;
   
@@ -231,7 +232,6 @@ app.post('/', urlencodedParser,(req,res) =>{
             case "select":
             message = [];
             //Concat message
-            message.push(recipeMessage[0]);
             message.push(chosenRecipes[item]);
             message.push(chosenRecipes[item + 1]);
             message.push(togetherMessage[0]);
@@ -273,7 +273,6 @@ app.post('/', urlencodedParser,(req,res) =>{
             web.chat.postMessage({as_user: false, icon_url: 'https://ca.slack-edge.com/TD5LXAAQ7-UD6KHGA93-g52a4dea3649-72', channel: recipient , text: "Hey, ich hätte Lust das hier zu kochen, bist du dabei?", blocks: lauraMessage, username: 'Meki',})
             .then((res) => {
             // `res` contains information about the posted message
-            console.log('Message sent to Laura: ', res.ts);
             invitationTimeStamp = res.ts;
              })
             .catch(console.error);
@@ -287,19 +286,39 @@ app.post('/', urlencodedParser,(req,res) =>{
             message.push(chosenRecipes[item + 1]);
             message.push(lauraInvited[1]);
             sendBlock = true;
+            //Reply to Laura
             lauraMessage = [];
             lauraMessage.push(recipeArray[item]);
             lauraMessage.push(recipeArray[item + 1]);
             lauraMessage.push(userInvitation[2]);
-            web.chat.update({ channel: recipient , text: "Super, bis gleich!", blocks: lauraMessage, ts: invitationTimeStamp})
-            .then((res) => {
-            // `res` contains information about the posted message
-            console.log('Message sent to Laura: ', res.ts);
-            
-             })
-            .catch(console.error);
+            recipientText = "Super, bis gleich!";
+            answerUser = true;
+            break;
+            case "invitationDenied":
+            message = [];
+            //Concat message in users Channel
+            message.push(chosenRecipes[item]);
+            message.push(recipeArray[item + 2]);
+            message.push(chosenRecipes[item + 1]);
+            message.push(lauraInvited[2]);
+            sendBlock = true;
+            //Reply to Laura
+            lauraMessage = [];
+            lauraMessage.push(userInvitation[3]);
+            recipientText = "Schade, vielleicht ein ander mal";
+            answerUser = true;
             break;
         }
+    }
+
+    if(answerUser) {
+        web.chat.update({ channel: recipient , text: recipientText, blocks: lauraMessage, ts: invitationTimeStamp})
+        .then((res) => {
+        // `res` contains information about the posted message
+        console.log('Message sent to Laura: ', res.ts);
+        
+         })
+        .catch(console.error);
     }
 
     if (type == "dialog_submission"){
