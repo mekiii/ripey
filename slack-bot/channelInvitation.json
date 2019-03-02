@@ -1,0 +1,18 @@
+[
+	{
+		"type": "section",
+		"text": {
+			"type": "mrkdwn",
+			"text": "Hey, ich hätte Lust das hier zu kochen, wer schließt sich an?"
+		},
+		"accessory": {
+			"type": "button",
+			"text": {
+				"type": "plain_text",
+				"text": "Klar Brudi!",
+				"emoji": true
+			},
+			"value": "selected"
+		}
+	}
+]
