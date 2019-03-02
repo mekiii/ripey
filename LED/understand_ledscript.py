@@ -5,66 +5,8 @@ import time
 import os
 os.system("sudo pigpiod")
 
+# -----------------------------------------------------
 
-SENSOR_PIN = 23
-
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(SENSOR_PIN, GPIO.IN)
-
-
-
-print ("Bereit")
-onlyRed = 0
-yellow = False
-
-def mein_callback(channel):
-    # Hier kann alternativ eine Anwendung/Befehl etc. gestartet werden.
-    print('Es gab eine Bewegung!')
-    onlyRed = 1
-     
-    try:
-        GPIO.add_event_detect(SENSOR_PIN , GPIO.RISING, callback=mein_callback)
-        while True:
-            time.sleep(100)
-    except KeyboardInterrupt:
-        print "Beende..."
-    GPIO.cleanup()
-
-
-
- # -----------------------------------------------------
- # File        fading.py
- # Authors     David Ordnung
- # License     GPLv3
- # Web         http://dordnung.de/raspberrypi-ledstrip/
- # -----------------------------------------------------
- # 
- # Copyright (C) 2014-2017 David Ordnung
- # 
- # This program is free software: you can redistribute it and/or modify
- # it under the terms of the GNU General Public License as published by
-
-
-
-# the Free Software Foundation, either version 3 of the License, or
- # any later version.
- #  
- # This program is distributed in the hope that it will be useful,
- # but WITHOUT ANY WARRANTY; without even the implied warranty of
- # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- # GNU General Public License for more details.
- # 
- # You should have received a copy of the GNU General Public License
- # along with this program. If not, see <http://www.gnu.org/licenses/>
-#
-
-
-# This script needs running pigpio (http://abyz.co.uk/rpi/pigpio/)
-
-
-###### CONFIGURE THIS ######
-
-# The Pins. Use Broadcom numbers.
 RED_PIN   = 17
 GREEN_PIN = 22
 BLUE_PIN  = 24
@@ -82,7 +24,7 @@ import pigpio
 import time
 from thread import start_new_thread
 
-bright = 80
+bright = 40
 r = 255.0
 g = 0.0
 
@@ -91,6 +33,10 @@ brightChanged = False
 abort = False
 state = True
 raiseColor = 0
+
+onlyRed = 0
+yellow = False
+test = False
 
 pi = pigpio.pi()
 
@@ -129,7 +75,9 @@ def checkKey():
     global brightChanged
     global state
     global abort
-    global onlyRed 
+    global onlyRed
+    global yellow
+    global test
 
     while True:
         c = getCh()
@@ -173,6 +121,11 @@ def checkKey():
             print ("yellow = true")
             break
         
+        if c == 't':
+            test = True
+            print ("test = true")
+            break
+        
         if c == 'c' and not abort:
             abort = True
             break
@@ -181,21 +134,17 @@ def checkKey():
 
 start_new_thread(checkKey, ())
 
-
 print ("+ / - = Increase / Decrease brightness")
 print ("p / w = Pause / weiter")
 print ("c = Abort Program")
 
-
 setLights(RED_PIN, r)
 setLights(GREEN_PIN, g)
-
-
 
 if onlyRed == 1:
     raiseColor = 0
     
-while abort == False and onlyRed == 0 and yellow == False:
+while abort == False and onlyRed == 0 and yellow == False and test == False:
     if state and not brightChanged:    
         if raiseColor == 0:
             g = updateColor(g, +STEPS)
@@ -234,7 +183,7 @@ while abort == False and yellow == True:
             setLights(RED_PIN, r)
             g = updateColor(g, -STEPS)
             setLights(GREEN_PIN, g)
-            print ("yellow")
+            print (r)
             if r <= 5:
                 raiseColor = 1
                 # print ("raiseColor = 1")
@@ -242,11 +191,51 @@ while abort == False and yellow == True:
         if raiseColor == 1:
             r = updateColor(r, STEPS)
             setLights(RED_PIN, r)
-            # print ("only r++")
+            r = updateColor(r, STEPS)
+            setLights(RED_PIN, r)
+            print ("yellow =", r ,g)
+            g = updateColor(g, STEPS)
+            setLights(GREEN_PIN, g)
             if r >= 30:
                 raiseColor = 0
                 # print ("only r--")
-                # print ("still looping")                    
+                # print ("still looping")
+                
+# when t-key hittet
+if test == True:
+    # define  wanted color for red and green LED
+    r = 205
+    g = 100
+    print ("test r =" , r, "and g =", g)
+    # now set red and green LED to wanted brightness
+    setLights(RED_PIN, r)
+    setLights(GREEN_PIN, g)
+    raiseColor = 0
+    while abort == False:
+        if state and not brightChanged:
+            # make wave effect
+            
+            if raiseColor == 0:
+                r = updateColor(r, -STEPS)
+                setLights(RED_PIN, r)
+                g = updateColor(g, -STEPS)
+                setLights(GREEN_PIN, g)
+                print ("r =", r)
+                if g <= 5:
+                    raiseColor = 1
+                    print ("raiseColor = 1")
+
+            if raiseColor == 1:
+                r = updateColor(r, STEPS)
+                setLights(RED_PIN, r)
+                print ("yellow =", r ,g)
+                g = updateColor(g, STEPS)
+                setLights(GREEN_PIN, g)
+                if r >= 150:
+                    raiseColor = 0
+            
+       
+                
                            
             
 print ("Aborting...")
@@ -257,5 +246,6 @@ setLights(GREEN_PIN, 0)
 time.sleep(0.5)
 
 pi.stop()#
+
 
 

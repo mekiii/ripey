@@ -27,7 +27,7 @@ try:
  # Warten bis Sensor sich meldet
  while GPIO.input(GPIO_PIR)==1:
    Current_State  = 0
-
+   
  print "%s: Fertig! Warte auf Bewegung..."  % datetime.datetime.now()
 
  # Schleife bis CTRL+C
@@ -35,6 +35,7 @@ try:
 
    #Status von Sensor auslesen
    Current_State = GPIO.input(GPIO_PIR)
+   # print ("waiting")
 
    if Current_State==1 and Previous_State==0:
 
