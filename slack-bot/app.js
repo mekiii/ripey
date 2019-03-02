@@ -12,6 +12,7 @@ var speps = 'DFW90MKHA';
 var devChannel = 'CFXFT82NB';
 var selectedChannel;
 var selectedTime;
+var approvingUsers =[];
 
 //Declare some variables
 var timeStamp;
@@ -20,7 +21,7 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 //Get slackclient
 const { WebClient } = require('@slack/client');
-const myToken = "xoxb-447711350823-540306733076-xyo0YD4tyaw6HbPaNJlHipOT";
+const myToken = "xoxb-447711350823-540306733076-olMMPWayYzPzeo5WgjW22wXg";
 const web = new WebClient(myToken);
 const conversationId = meki;
 
@@ -241,6 +242,7 @@ app.post('/', urlencodedParser,(req,res) =>{
         console.log(selectedChannel);
     }
 
+
     if(actions[0].type == 'static_select'){
         selectedTime = actions[0].selected_option.value;
         console.log(selectedTime);
@@ -361,7 +363,6 @@ app.post('/', urlencodedParser,(req,res) =>{
             message.push(recipeArray[item + 1]);
             channelInvitation[0].text.text += " Um " + selectedTime + " Uhr würden wir anfangen.";
             message.push(channelInvitation[0]);
-            console.log(selectedChannel);
             web.chat.postMessage({as_user: false, icon_url: 'https://ca.slack-edge.com/TD5LXAAQ7-UD6KHGA93-g52a4dea3649-72', channel: selectedChannel, text: channelInvitation[0].text.text, blocks: message, username: 'Meki',})
             .then((res) => {
             // `res` contains information about the posted message
@@ -369,6 +370,29 @@ app.post('/', urlencodedParser,(req,res) =>{
              })
             .catch(console.error);
             break;
+            case "user_selected":
+            var newUser = JSON.parse(reqBody.payload).user.username;
+            console.log("!approvingUsers.includes(newUser): " + !approvingUsers.includes(newUser));
+            if (!approvingUsers.includes(newUser)){
+                approvingUsers.push(newUser);
+                message = [];
+                message.push(recipeArray[item]);
+                message.push(recipeArray[item + 2]);
+                message.push(recipeArray[item + 1]);
+                var lastIndex = approvingUsers.length - 1;
+                    channelInvitation[0].text.text += "\n " + "*" + approvingUsers[lastIndex] + "*" +" ist dabei! :carrot:";
+                message.push(channelInvitation[0]);
+
+                web.chat.update({ channel: selectedChannel, text: channelInvitation[0].text.text, attachments: [], ts: invitationTimeStamp, blocks: message })
+                .then((res) => {
+                    // `res` contains information about the posted message
+                    console.log('Block message sent: ', res.ts);
+                })
+                .catch(console.error);
+            }
+            
+            break;
+            
             
         }
     }
