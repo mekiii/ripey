@@ -24,8 +24,8 @@ import time
 from thread import start_new_thread
 
 bright = 40
-r = 255.0
-g = 0.0
+r = 0
+g = 0
 
 
 brightChanged = False
@@ -166,13 +166,15 @@ def key_functions():
     global g
 
 
-    #make green light
-    while abort == False and onlyRed == 0 and yellow == False and test == False:
-        if state and not brightChanged:    
-            if raiseColor == 0:
-                g = updateColor(g, +STEPS)
-                setLights(GREEN_PIN, g)
-                print ("g++")      
+    #make yellow light
+   # while abort == False and onlyRed == 0 and yellow == False and test == False:
+  #      if state and not brightChanged:    
+     #       if raiseColor == 0:
+    #            g = updateColor(g, +STEPS)
+    #            setLights(GREEN_PIN, g)
+    #            g = updateColor(g, +STEPS)
+    #            setLights(GREEN_PIN, g)
+    #            print ("g++")      
 
 #    # when r-key hit
 #    while abort == False and onlyRed == 1:
@@ -205,10 +207,12 @@ def key_functions():
             if raiseColor == 0:
                 r = updateColor(r, -STEPS)
                 setLights(RED_PIN, r)
+                r = updateColor(r, -STEPS)
+                setLights(RED_PIN, r)
                 g = updateColor(g, -STEPS)
                 setLights(GREEN_PIN, g)
                 print (r)
-                if r <= 5:
+                if g <= 5:
                     raiseColor = 1
                     # print ("raiseColor = 1")
 
@@ -220,7 +224,7 @@ def key_functions():
                 print ("yellow =", r ,g)
                 g = updateColor(g, STEPS)
                 setLights(GREEN_PIN, g)
-                if r >= 30:
+                if g >= 100:
                     raiseColor = 0
                     # print ("only r--")
                     # print ("still looping")
@@ -264,8 +268,8 @@ key_functions()
             
 print ("Aborting...")
 
-setLights(RED_PIN, 0)
-setLights(GREEN_PIN, 0)
+setLights(RED_PIN, 00)
+setLights(GREEN_PIN, 00)
 
 time.sleep(0.5)
 
