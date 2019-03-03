@@ -1,7 +1,5 @@
 # import RPi.GPIO as GPIO
 
-
-
 # -----------------------------------------------------
 
 RED_PIN   = 17
@@ -153,6 +151,8 @@ setLights(GREEN_PIN, g)
 
 if onlyRed == 1:
     raiseColor = 0
+    
+    
 
 
 def key_functions():
@@ -166,6 +166,14 @@ def key_functions():
     global raiseColor
     global r
     global g
+    
+    #make light for 5 secs
+    t_end = time.time() + 5
+    while time.time() < t_end:
+        setLights(RED_PIN, 200)
+        setLights(GREEN_PIN, 100)
+        print ("time = 5 secs")
+        
 
 
     #make green light
@@ -174,7 +182,9 @@ def key_functions():
             if raiseColor == 0:
                 g = updateColor(g, +STEPS)
                 setLights(GREEN_PIN, g)
-                print ("g++")      
+                print ("g++")
+                # time.sleep(2)
+                
 
 #    # when r-key hit
 #    while abort == False and onlyRed == 1:
@@ -259,8 +269,57 @@ def key_functions():
 #                    setLights(GREEN_PIN, g)
 #                    if r >= 150:
 #                        raiseColor = 0
+
+# key_functions()
                 
-key_functions()           
+####################### RELAIS SCRIPT START
+ 
+import RPi.GPIO as GPIO
+
+#
+## spreche GPIO pin 14 an
+relais = 14
+#
+GPIO.setmode(GPIO.BCM)
+#
+GPIO.setup(relais, GPIO.OUT)
+setLights(RED_PIN, 0)
+setLights(GREEN_PIN, 0)
+print ("GREEN AND RED = 0")
+#
+#
+GPIO.output(relais, GPIO.HIGH)
+time.sleep(5)
+print ("high1")
+
+#
+GPIO.output(relais, GPIO.LOW)
+time.sleep(5)
+print ("start key functions")
+key_functions() 
+#
+
+GPIO.output(relais, GPIO.HIGH)
+time.sleep(5)
+print ("high2")
+
+#
+#GPIO.output(relais, GPIO.LOW)
+#time.sleep(5)
+
+ 
+####################### RELAiS SCRIPT END
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                
                 
                            
             
@@ -272,6 +331,7 @@ setLights(GREEN_PIN, 0)
 time.sleep(0.5)
 
 pi.stop()#
+
 
 
 

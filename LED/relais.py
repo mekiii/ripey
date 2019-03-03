@@ -8,7 +8,7 @@ GPIO.setmode(GPIO.BCM)
 
 GPIO.setup(relais, GPIO.OUT)
 # importiere led9 - script
-import led10
+# import led10
 
 
 GPIO.output(relais, GPIO.HIGH)
