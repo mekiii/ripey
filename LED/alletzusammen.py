@@ -1,7 +1,6 @@
 # import RPi.GPIO as GPIO
 
 # -----------------------------------------------------
-
 RED_PIN   = 17
 GREEN_PIN = 22
 BLUE_PIN  = 24
@@ -9,7 +8,6 @@ BLUE_PIN  = 24
 # Number of color changes per step (more is faster, less is slower).
 # You also can use 0.X floats.
 STEPS     = 0.01
-
 
 # execute terminal command and start pigpiod
 import os
@@ -24,7 +22,7 @@ import time
 from thread import start_new_thread
 
 bright = 40
-r = 255.0
+r = 0.0
 g = 0.0
 
 
@@ -35,8 +33,6 @@ raiseColor = 0
 onlyRed = 0
 yellow = False
 test = False
-
-
 
 pi = pigpio.pi()
 
@@ -172,18 +168,21 @@ def key_functions():
     while time.time() < t_end:
         setLights(RED_PIN, 200)
         setLights(GREEN_PIN, 100)
-        print ("time = 5 secs")
+        #print ("time = 5 secs")
+    print ("5 sec are over")
+    setLights(RED_PIN, 0)
+    setLights(GREEN_PIN, 0)
         
 
 
-    #make green light
-    while abort == False and onlyRed == 0 and yellow == False and test == False:
-        if state and not brightChanged:    
-            if raiseColor == 0:
-                g = updateColor(g, +STEPS)
-                setLights(GREEN_PIN, g)
-                print ("g++")
-                # time.sleep(2)
+#    #make green light
+#    while abort == False and onlyRed == 0 and yellow == False and test == False:
+#        if state and not brightChanged:    
+#            if raiseColor == 0:
+#                g = updateColor(g, +STEPS)
+#                setLights(GREEN_PIN, g)
+#                print ("g++")
+#                # time.sleep(2)
                 
 
 #    # when r-key hit
@@ -210,7 +209,7 @@ def key_functions():
 #                    print ("still looping")
 #                    
     # when y-key hit
-    yellow = True
+    #yellow = True
     while abort == False and yellow == True:
         if state and not brightChanged:
             # light go out
@@ -273,35 +272,29 @@ def key_functions():
 # key_functions()
                 
 ####################### RELAIS SCRIPT START
- 
-import RPi.GPIO as GPIO
+def startRelais(): 
+    #import RPi.GPIO as GPIO
+    GPIO.setmode(GPIO.BCM)
 
-#
-## spreche GPIO pin 14 an
-relais = 14
-#
-GPIO.setmode(GPIO.BCM)
-#
-GPIO.setup(relais, GPIO.OUT)
-setLights(RED_PIN, 0)
-setLights(GREEN_PIN, 0)
-print ("GREEN AND RED = 0")
-#
-#
-GPIO.output(relais, GPIO.HIGH)
-time.sleep(5)
-print ("high1")
-
-#
-GPIO.output(relais, GPIO.LOW)
-time.sleep(5)
-print ("start key functions")
-key_functions() 
-#
-
-GPIO.output(relais, GPIO.HIGH)
-time.sleep(5)
-print ("high2")
+    ## spreche GPIO pin 14 an
+    relais = 14
+    #
+    GPIO.setmode(GPIO.BCM)
+    #
+    GPIO.setup(relais, GPIO.OUT)
+    #setLights(RED_PIN, 0)
+    #setLights(GREEN_PIN, 0)
+    print ("GREEN AND RED = 0")
+    #key_functions()
+    
+    
+    GPIO.output(relais, GPIO.LOW)
+    time.sleep(5)
+    print ("low = high1")
+    
+    GPIO.output(relais, GPIO.HIGH)
+    time.sleep(5)
+    print ("high1 = low")
 
 #
 #GPIO.output(relais, GPIO.LOW)
@@ -309,20 +302,42 @@ print ("high2")
 
  
 ####################### RELAiS SCRIPT END
+
+####### START PIR
+
+import RPi.GPIO as GPIO
+SENSOR_PIN = 23
  
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(SENSOR_PIN, GPIO.IN)
+
+
+movement = False
+
+print ("Bereit")
+
+def mein_callback(channel):
+    # Hier kann alternativ eine Anwendung/Befehl etc. gestartet werden.
+    print('Es gab eine Bewegung!')
+    
+    start_new_thread(startRelais, ())
+    start_new_thread(key_functions, ())
+    
+    
+    
+   
+try:
+    GPIO.add_event_detect(SENSOR_PIN , GPIO.RISING, callback=mein_callback)
+    print ("waiting")
+    while True:
+        time.sleep(100)
+except KeyboardInterrupt:
+    print "Beende..."
+GPIO.cleanup()
+
  
+########### END PIR 
  
- 
- 
- 
- 
- 
- 
- 
-                
-                
-                           
-            
 print ("Aborting...")
 
 setLights(RED_PIN, 0)
