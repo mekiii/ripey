@@ -11,11 +11,18 @@
 		"image_url": "https://i.imgur.com/5ntpPel.jpg",
 		"alt_text": "Frischer Frühlingssalat"
 	},
-    {
+  {
 		"type": "section",
 		"text": {
 			"type": "mrkdwn",
-			"text": "*Zutaten* \n - 60g Walnüsse \n - 100g geriebene Karotten \n - 50g Oliven \n - 50g Zwiebeln \n - *100g angebauter Endiviensalat* \n - 20g Dressing \n \n*Rezept:* \n Bacon ipsum dolor amet kevin boudin pork belly, hamburger alcatra beef meatball chuck bacon chicken tri-tip kielbasa ribeye. Pancetta pork loin tongue, meatloaf jerky landjaeger corned beef biltong. Prosciutto short ribs pastrami, meatball chuck corned beef ham pig pork belly beef ribs capicola shank tail. Corned beef t-bone prosciutto bacon. "
+			"text": "*Zutaten:* \n- 100g angebauter Endiviensalat\n- 60g Walnüsse\n- 100g geriebene Karotten\n- 50g Oliven\n- 50g Zwiebeln\n- 20g Dressing\n  "
+		}
+	},
+  {
+		"type": "section",
+		"text": {
+			"type": "mrkdwn",
+			"text": "*Rezept:* \n Bacon ipsum dolor amet kevin boudin pork belly, hamburger alcatra beef meatball chuck bacon chicken tri-tip kielbasa ribeye. Pancetta pork loin tongue, meatloaf jerky landjaeger corned beef biltong. Prosciutto short ribs pastrami, meatball chuck corned beef ham pig pork belly beef ribs capicola shank tail. Corned beef t-bone prosciutto bacon. "
 		}
 	},
 	{
@@ -34,9 +41,16 @@
 		"type": "section",
 		"text": {
 			"type": "mrkdwn",
-			"text": "*Zutaten* \n - 60g Walnüsse \n - 100g geriebene Karotten \n - 50g Oliven \n - 50g Zwiebeln \n - *100g angebauter Endiviensalat* \n - 20g Dressing \n \n*Rezept:* \n Bacon ipsum dolor amet kevin boudin pork belly, hamburger alcatra beef meatball chuck bacon chicken tri-tip kielbasa ribeye. Pancetta pork loin tongue, meatloaf jerky landjaeger corned beef biltong. Prosciutto short ribs pastrami, meatball chuck corned beef ham pig pork belly beef ribs capicola shank tail. Corned beef t-bone prosciutto bacon. "
-		}
+			"text": "*Zutaten:* \n - *100g angebauter Rucola* \n - *1 angebaute Tomate* \n - 4 Weißbrot \n- 100g frischer Mozzarella \n - grünes Pesto"
+			}
     },
+    {
+		"type": "section",
+		"text": {
+			"type": "mrkdwn",
+			"text": "*Rezept:* \n Bacon ipsum dolor amet kevin boudin pork belly, hamburger alcatra beef meatball chuck bacon chicken tri-tip kielbasa ribeye. Pancetta pork loin tongue, meatloaf jerky landjaeger corned beef biltong. Prosciutto short ribs pastrami, meatball chuck corned beef ham pig pork belly beef ribs capicola shank tail. Corned beef t-bone prosciutto bacon. "
+		}
+	},
 	{
 		"type": "section",
 		"text": {
@@ -53,7 +67,14 @@
 		"type": "section",
 		"text": {
 			"type": "mrkdwn",
-			"text": "*Zutaten* \n - 60g Walnüsse \n - 100g geriebene Karotten \n - 50g Oliven \n - 50g Zwiebeln \n - *100g angebauter Endiviensalat* \n - 20g Dressing \n \n*Rezept:* \n Bacon ipsum dolor amet kevin boudin pork belly, hamburger alcatra beef meatball chuck bacon chicken tri-tip kielbasa ribeye. Pancetta pork loin tongue, meatloaf jerky landjaeger corned beef biltong. Prosciutto short ribs pastrami, meatball chuck corned beef ham pig pork belly beef ribs capicola shank tail. Corned beef t-bone prosciutto bacon. "
+			"text": "*Zutaten* \n - 200g Farfalle \n - 50g Parmesan \n - grünes Pesto \n - *2 angebaute Kirschtomaten* \n - Olivenöl \n"
+			}
+    },
+    {
+		"type": "section",
+		"text": {
+			"type": "mrkdwn",
+			"text": "*Rezept:* \n Bacon ipsum dolor amet kevin boudin pork belly, hamburger alcatra beef meatball chuck bacon chicken tri-tip kielbasa ribeye. Pancetta pork loin tongue, meatloaf jerky landjaeger corned beef biltong. Prosciutto short ribs pastrami, meatball chuck corned beef ham pig pork belly beef ribs capicola shank tail. Corned beef t-bone prosciutto bacon. "
+			}
 		}
-    }
 ]

@@ -9,10 +9,20 @@
 			"type": "button",
 			"text": {
 				"type": "plain_text",
-				"text": "Klar Brudi!",
+				"text": "Bin dabei!",
 				"emoji": true
 			},
 			"value": "user_selected"
+		}
+	},
+	{
+		"type": "divider"
+	},
+	{
+		"type": "section",
+		"text": {
+			"type": "mrkdwn",
+			"text": " "
 		}
 	}
 ]

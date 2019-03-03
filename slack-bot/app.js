@@ -6,13 +6,10 @@ var app = express();
 var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require('fs'));
 var item = 0;
-var laura = 'DFWKPFLJH';
-var meki = 'DFW90MLUC';
-var speps = 'DFW90MKHA';
-var devChannel = 'CFXFT82NB';
 var selectedChannel;
 var selectedTime;
 var approvingUsers =[];
+let user;
 
 //Declare some variables
 var timeStamp;
@@ -21,33 +18,8 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 //Get slackclient
 const { WebClient } = require('@slack/client');
-const myToken = "xoxb-447711350823-540306733076-gQXqK8SCGT3jcm5QLO7sp1v7";
+const myToken = "xoxb-447711350823-540306733076-twY3FsyHXzgY3OEz5IBshBUC";
 const web = new WebClient(myToken);
-const conversationId = meki;
-
-
-//Read final message js
-var finalMessage;
-fs.readFile('./finalMessage.json', function read(err, data) {
-  if (err) {
-      throw err;
-  }
-  content = data.toString('utf8');
-  finalMessage = JSON.parse(content);
-});
-
-
-//Read dialog js
-var dialog;
-fs.readFile('./dialog.json', function read(err, data) {
-  if (err) {
-      throw err;
-  }
-  content = data.toString('utf8');
-  dialog = JSON.parse(content);
-});
-
-
 
 async function loadJSON (jsonPath){
 
@@ -56,6 +28,19 @@ async function loadJSON (jsonPath){
   data = JSON.parse(data);
   return data;
 }
+
+
+var notificationPath = "./notification.json";
+var notification;
+(async () => {
+    try {
+        notification = await loadJSON(notificationPath);   
+    } catch (e) {
+        console.log(e);
+        // Deal with the fact the chain failed
+    }
+})();
+
 var recipePath = './recipe_message.json';
 var recipeMessage;
 
@@ -101,28 +86,6 @@ var chosenRecipes;
     }
 })();
 
-var invitationPath = "./invitation.json";
-var invitationMessage;
-(async () => {
-    try {
-        invitationMessage = await loadJSON(invitationPath);   
-    } catch (e) {
-        console.log(e);
-        // Deal with the fact the chain failed
-    }
-})();
-
-var notificationPath = "./notification.json";
-var notification;
-(async () => {
-    try {
-        notification = await loadJSON(notificationPath);   
-    } catch (e) {
-        console.log(e);
-        // Deal with the fact the chain failed
-    }
-})();
-
 var lonerPath = "./loner.json";
 var eatingAlone;
 (async () => {
@@ -144,27 +107,7 @@ var cancelMessage;
         // Deal with the fact the chain failed
     }
 })();
-var lauraPath = "./laura_invited.json";
-var lauraInvited;
-(async () => {
-    try {
-        lauraInvited = await loadJSON(lauraPath);   
-    } catch (e) {
-        console.log(e);
-        // Deal with the fact the chain failed
-    }
-})();
 
-var userInvitationPath = "./userInvitation.json";
-var userInvitation;
-(async () => {
-    try {
-        userInvitation = await loadJSON(userInvitationPath);   
-    } catch (e) {
-        console.log(e);
-        // Deal with the fact the chain failed
-    }
-})();
 
 var channelSelectionPath = "./channelSelection.json";
 var channelSelection;
@@ -188,31 +131,63 @@ var channelInvitation;
     }
 })();
 
+//Get user information
+var userList = [];
+web.users.list({token: myToken})
+.then((res) => {
+    // `res` contains information about the posted message
+    for (i = 0; i < res.members.length; i++){
+        if(res.members[i].is_bot == false && res.members[i].name != 'slackbot'){
+            userList.push(res.members[i]);
+        }  
+    }
 
-var timer = setInterval(sendNotification, 10000);
-
-
-//First post ripeness notification
-function sendNotification(){
-    web.chat.postMessage({ as_user: false, channel: conversationId, text: "Hey es ist ganz viel Gemüse reif geworden! Hast du Lust auf einen Rezeptvorschlag?", attachments: [], blocks: notification })
+    //Get get user Channel ID
+    web.im.list({token: myToken})
     .then((res) => {
         // `res` contains information about the posted message
-        console.log('Message sent: ', res.ts);
-        timeStamp = res.ts;
+        for (i = 0; i < res.ims.length; i++){
+            for (j = 0; j < userList.length; j++){
+                if (res.ims[i].user == userList[j].id){
+                    userList[j].channel = res.ims[i].id;
+                break;
+                }
+            }  
+        }
+        //Set to random conversation ID
+        var randomIndex = Math.floor((Math.random() * (userList.length - 1)));
+        user = userList[randomIndex];
+        console.log(user.name + ": " + user.channel);
     })
     .catch(console.error);
-}
-//Get Users
-var userList= [];
-web.im.list({token: myToken})
-.then((res) => {
-    console.log("###########################################################");
-    for (i = 0; i < res.ims.length; i++){
-        userList.push(res.ims[i].id);
-    }
 })
 .catch(console.error);
 
+
+
+
+
+
+
+let isNotified = true;
+
+//Send notification every 10 seconds
+    var timer = setInterval(sendNotification, 10000);
+
+//First post ripeness notification
+function sendNotification(){
+    if(user.channel != null){
+        web.chat.postMessage({ channel: user.channel, text: "Hey es ist ganz viel Gemüse reif geworden! Hast du Lust auf einen Rezeptvorschlag?", attachments: [], blocks: notification })
+        .then((res) => {
+            // `res` contains information about the posted message
+            console.log('Message sent: ', res.ts);
+            timeStamp = res.ts;
+        })
+        .catch(console.error);
+        clearInterval(timer);
+    }
+    
+}
 
 
 // Start server on port 3000
@@ -225,39 +200,26 @@ app.post('/', urlencodedParser,(req,res) =>{
   res.status(200).end() // best practice to respond with empty 200 status code
   var reqBody = req.body;
   var actions = JSON.parse(reqBody.payload).actions;
-  var trigger_id = JSON.parse(reqBody.payload).trigger_id;
-  var reqToken = JSON.parse(reqBody.payload).token;
-  var type = JSON.parse(reqBody.payload).type;
-  var openDialog = false;
-  var sendBlock = false;
-  var answerUser =false;
-  var recipient = laura;
-  var recipientText;
-
-  
-  var schedule;
+  var sendMessage = false;
 
     if(actions[0].selected_channel){
         selectedChannel = actions[0].selected_channel;
         console.log(selectedChannel);
     }
 
-
     if(actions[0].type == 'static_select'){
         selectedTime = actions[0].selected_option.value;
         console.log(selectedTime);
     }
 
-  
-
 //check what kind of action was triggered
-  if (actions){
+if (actions){
     clearInterval(timer);
     switch(actions[0].value){
+
             case "shuffle":
             // Shuffle recipes
-            item = (item + 3) % recipeArray.length;
-            console.log("item index: "+ item);
+            item = (item + 4) % recipeArray.length;
             message = [];
             //Concat message
             message.push(recipeMessage[0]);
@@ -265,8 +227,9 @@ app.post('/', urlencodedParser,(req,res) =>{
             message.push(recipeArray[item + 2]);
             message.push(recipeArray[item + 1]);
             message.push(recipeMessage[1]);
-            sendBlock = true;
+            sendMessage = true;
             break;
+
             case "select":
             message = [];
             //Concat message
@@ -274,105 +237,60 @@ app.post('/', urlencodedParser,(req,res) =>{
             message.push(chosenRecipes[item + 1]);
             message.push(togetherMessage[0]);
             message.push(togetherMessage[1]);
-            sendBlock = true;
+            sendMessage = true;
             break;
+
             case "quit":
             item = 0;
             message = cancelMessage;
-            sendBlock = true;
+            sendMessage = true;
             break;
+
             case "cook_together":
-            //openDialog = true;
             message = [];
             message.push(chosenRecipes[item]);
             message.push(chosenRecipes[item + 1]);
             message.push(channelSelection[0]);
             message.push(channelSelection[1]);
-            sendBlock = true;
+            sendMessage = true;
             break;
+
             case "cook_alone":
-            console.log("COOKING ALONE MTF!!!")
             message = [];
+            message.push(recipeArray[item + 1]);
             message.push(eatingAlone[0]);
             message.push(recipeArray[item]);
             message.push(recipeArray[item + 2]);
-            message.push(recipeArray[item + 1]);
-            sendBlock = true;
+            message.push(recipeArray[item + 3]);
+            sendMessage = true;
             break;
-            case "invite_laura":
-            message = [];
-            //Concat message in users Channel
-            message.push(chosenRecipes[item]);
-            message.push(chosenRecipes[item + 1]);
-            message.push(invitationMessage[0]);
-            message.push(lauraInvited[0]);
-            sendBlock = true;
-            lauraMessage = [];
-            lauraMessage.push(recipeArray[item]);
-            lauraMessage.push(recipeArray[item + 1]);
-            lauraMessage.push(userInvitation[0]);
-            lauraMessage.push(userInvitation[1]);
-            web.chat.postMessage({as_user: false, icon_url: 'https://ca.slack-edge.com/TD5LXAAQ7-UD6KHGA93-g52a4dea3649-72', channel: recipient , text: "Hey, ich hätte Lust das hier zu kochen, bist du dabei?", blocks: lauraMessage, username: 'Meki',})
-            .then((res) => {
-            // `res` contains information about the posted message
-            invitationTimeStamp = res.ts;
-             })
-            .catch(console.error);
-            sendBlock = true;
-            break;
-            case "invitationAccepted":
-            message = [];
-            //Concat message in users Channel
-            message.push(chosenRecipes[item]);
-            message.push(recipeArray[item + 2]);
-            message.push(chosenRecipes[item + 1]);
-            message.push(lauraInvited[1]);
-            sendBlock = true;
-            //Reply to Laura
-            lauraMessage = [];
-            lauraMessage.push(recipeArray[item]);
-            lauraMessage.push(recipeArray[item + 1]);
-            lauraMessage.push(userInvitation[2]);
-            recipientText = "Super, bis gleich!";
-            answerUser = true;
-            break;
-            case "invitationDenied":
-            message = [];
-            //Concat message in users Channel
-            message.push(chosenRecipes[item]);
-            message.push(recipeArray[item + 2]);
-            message.push(chosenRecipes[item + 1]);
-            message.push(lauraInvited[2]);
-            sendBlock = true;
-            //Reply to Laura
-            lauraMessage = [];
-            lauraMessage.push(userInvitation[3]);
-            recipientText = "Schade, vielleicht ein ander mal";
-            web.chat.postMessage({as_user: false, icon_url: 'https://ca.slack-edge.com/TD5LXAAQ7-UD6KHGA93-g52a4dea3649-72', channel: recipient , text: recipientText, blocks: lauraMessage, username: 'Meki',})
-            .then((res) => {
-            // `res` contains information about the posted message
-            invitationTimeStamp = res.ts;
-             })
-            .catch(console.error);
-            //answerUser = true;
-            break;
+
             case "send_to_channel":
             message = [];
             message.push(recipeArray[item]);
             message.push(recipeArray[item + 2]);
             message.push(recipeArray[item + 1]);
-            channelInvitation[0].text.text += " Um " + selectedTime + " Uhr würden wir anfangen.";
+            channelInvitation[0].text.text += "\n Um " + selectedTime + " Uhr würden wir anfangen.";
             message.push(channelInvitation[0]);
-            web.chat.postMessage({as_user: false, icon_url: 'https://ca.slack-edge.com/TD5LXAAQ7-UD6KHGA93-g52a4dea3649-72', channel: selectedChannel, text: channelInvitation[0].text.text, blocks: message, username: 'Meki',})
+            message.push(channelInvitation[1]);
+            web.chat.postMessage({as_user: false, icon_url: 'https://ca.slack-edge.com/TD5LXAAQ7-UD6KHGA93-g52a4dea3649-72', channel: selectedChannel, text: channelInvitation[0].text.text, blocks: message, username: user.name,})
             .then((res) => {
-            // `res` contains information about the posted message
-            invitationTimeStamp = res.ts;
+                // `res` contains information about the posted message
+                invitationTimeStamp = res.ts;
              })
             .catch(console.error);
+            message = [];
+            message.push(chosenRecipes[item]);
+            message.push(chosenRecipes[item + 1]);
+            channelSelection[0].text.text = "Dein Vorschlag wurde in deinen ausgewählten Kanal geschickt.\n Hier ist das Rezept:" 
+            message.push(channelSelection[0]);
+            message.push(recipeArray[item + 2]);
+            message.push(recipeArray[item + 3]);
+            sendMessage = true;
             break;
+
             case "user_selected":
             var newUser = JSON.parse(reqBody.payload).user.username;
-            console.log("!approvingUsers.includes(newUser): " + !approvingUsers.includes(newUser));
             if (!approvingUsers.includes(newUser)){
                 approvingUsers.push(newUser);
                 message = [];
@@ -380,50 +298,24 @@ app.post('/', urlencodedParser,(req,res) =>{
                 message.push(recipeArray[item + 2]);
                 message.push(recipeArray[item + 1]);
                 var lastIndex = approvingUsers.length - 1;
-                    channelInvitation[0].text.text += "\n " + "*" + approvingUsers[lastIndex] + "*" +" ist dabei! :carrot:";
+                    channelInvitation[2].text.text += "\n " + "*" + approvingUsers[lastIndex] + "*" +" ist dabei! :carrot:";
                 message.push(channelInvitation[0]);
+                message.push(channelInvitation[1]);
+                message.push(channelInvitation[2]);
+                //update channel message
 
                 web.chat.update({ channel: selectedChannel, text: channelInvitation[0].text.text, attachments: [], ts: invitationTimeStamp, blocks: message })
                 .then((res) => {
-                    // `res` contains information about the posted message
                     console.log('Block message sent: ', res.ts);
                 })
                 .catch(console.error);
             }
-            
-            break;
-            
-            
+            break;  
         }
     }
 
-    
-    if(answerUser) {
-        web.chat.update({ channel: recipient , text: recipientText, blocks: lauraMessage, ts: invitationTimeStamp})
-        .then((res) => {
-        // `res` contains information about the posted message
-         })
-        .catch(console.error);
-    }
-
-    if (type == "dialog_submission"){
-        message = [];
-        //Concat message
-        schedule = JSON.parse(reqBody.payload).submission.together;
-        console.log("Schedule: " + schedule);
-        message.push(chosenRecipes[item]);
-        message.push(chosenRecipes[item + 1]);
-        invitationMessage[0].text.text += '*' + schedule + '* Uhr:';
-        userInvitation[0].text.text += "\n Um *" + schedule + "* Uhr würde ich anfangen."; 
-        for (i=0; i < invitationMessage.length; i++){
-            message.push(invitationMessage[i]);
-        }
-        sendBlock = true;
-
-    }
-
-    if(sendBlock) {
-        web.chat.update({ channel: conversationId, text: "Here's a block", attachments: [], ts: timeStamp, blocks: message })
+    if(sendMessage) {
+        web.chat.update({ channel: user.channel, text: "Here's a block", attachments: [], ts: timeStamp, blocks: message })
         .then((res) => {
             // `res` contains information about the posted message
             console.log('Block message sent: ', res.ts);
@@ -431,7 +323,4 @@ app.post('/', urlencodedParser,(req,res) =>{
         .catch(console.error);
     }
 
-    if(openDialog){
-        web.dialog.open({reqToken, dialog, trigger_id});
-    }
 })

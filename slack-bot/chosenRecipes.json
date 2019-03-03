@@ -19,6 +19,13 @@
 		}
     },
     {
+		"type": "section",
+		"text": {
+			"type": "mrkdwn",
+			"text": "."
+		}
+    },
+    {
             "type": "section",
             "text": {
                 "type": "mrkdwn",
@@ -38,6 +45,13 @@
 		}
     },
     {
+		"type": "section",
+		"text": {
+			"type": "mrkdwn",
+			"text": "."
+		}
+    },
+    {
         "type": "section",
         "text": {
             "type": "mrkdwn",
@@ -54,6 +68,13 @@
 		"text": {
 			"type": "mrkdwn",
 			"text": "*.*"
+		}
+    },
+    {
+		"type": "section",
+		"text": {
+			"type": "mrkdwn",
+			"text": "."
 		}
     }
 ]
