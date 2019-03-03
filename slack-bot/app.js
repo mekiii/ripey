@@ -2,6 +2,7 @@
 var express = require('express');
 var request = require('request');
 var bodyParser = require('body-parser');
+let multiplier = require('./ingredientsMultiplier');
 var app = express();
 var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require('fs'));
@@ -18,7 +19,11 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 //Get slackclient
 const { WebClient } = require('@slack/client');
+<<<<<<< Updated upstream
 const myToken = "xoxb-447711350823-540306733076-CesxFr4fuWdWidA5X6J1Pdwd";
+=======
+const myToken = "xoxb-447711350823-540306733076-S7Tgjz7DCojjTB24y2qfInHD";
+>>>>>>> Stashed changes
 const web = new WebClient(myToken);
 
 async function loadJSON (jsonPath){
@@ -28,6 +33,18 @@ async function loadJSON (jsonPath){
   data = JSON.parse(data);
   return data;
 }
+
+let zutatenPath = "./zutaten.json";
+let zutaten;
+
+(async () => {
+	try {
+		zutaten = await loadJSON(zutatenPath);
+	} catch (e) {
+		console.log(e);
+		// Deal with the fact the chain failed
+}
+})();
 
 
 var notificationPath = "./notification.json";
@@ -64,11 +81,12 @@ var togetherMessage;
     }
 })();
 
-var recipeArrayPath = "./recipeArray.json";
+var recipeArrayPath = "./recipeArray.1.json";
 var recipeArray;
 (async () => {
     try {
-        recipeArray = await loadJSON(recipeArrayPath);   
+        recipeArray = await loadJSON(recipeArrayPath);  
+        console.log(recipeArray.length); 
     } catch (e) {
         console.log(e);
         // Deal with the fact the chain failed
@@ -155,19 +173,13 @@ web.users.list({token: myToken})
             }  
         }
         //Set to random conversation ID
-        var randomIndex = Math.floor((Math.random() * (userList.length - 1)));
-        user = userList[randomIndex];
+        //var randomIndex = Math.floor((Math.random() * (userList.length - 1)));
+        user = userList[1];
         console.log(user.name + ": " + user.channel);
     })
     .catch(console.error);
 })
 .catch(console.error);
-
-
-
-
-
-
 
 let isNotified = true;
 
@@ -201,6 +213,7 @@ app.post('/', urlencodedParser,(req,res) =>{
   var reqBody = req.body;
   var actions = JSON.parse(reqBody.payload).actions;
   var sendMessage = false;
+  let zutatenBlock;
 
     if(actions[0].selected_channel){
         selectedChannel = actions[0].selected_channel;
@@ -224,7 +237,8 @@ if (actions){
             //Concat message
             message.push(recipeMessage[0]);
             message.push(recipeArray[item]);
-            message.push(recipeArray[item + 2]);
+            zutatenBlock = multiplier.getIngredients(zutaten,item/4, 1);
+            message.push(zutatenBlock);
             message.push(recipeArray[item + 1]);
             message.push(recipeMessage[1]);
             sendMessage = true;
@@ -260,7 +274,8 @@ if (actions){
             message.push(recipeArray[item + 1]);
             message.push(eatingAlone[0]);
             message.push(recipeArray[item]);
-            message.push(recipeArray[item + 2]);
+            zutatenBlock = multiplier.getIngredients(zutaten,item/4, 1);
+            message.push(zutatenBlock);
             message.push(recipeArray[item + 3]);
             sendMessage = true;
             break;
@@ -268,7 +283,8 @@ if (actions){
             case "send_to_channel":
             message = [];
             message.push(recipeArray[item]);
-            message.push(recipeArray[item + 2]);
+            zutatenBlock = multiplier.getIngredients(zutaten,item/4, 1);
+            message.push(zutatenBlock);
             message.push(recipeArray[item + 1]);
             channelInvitation[0].text.text += "\n Um " + selectedTime + " Uhr würden wir anfangen.";
             message.push(channelInvitation[0]);
@@ -284,7 +300,8 @@ if (actions){
             message.push(chosenRecipes[item + 1]);
             channelSelection[0].text.text = "Dein Vorschlag wurde in deinen ausgewählten Kanal geschickt.\n Hier ist das Rezept:" 
             message.push(channelSelection[0]);
-            message.push(recipeArray[item + 2]);
+            zutatenBlock = multiplier.getIngredients(zutaten,item/4, 1);
+            message.push(zutatenBlock);
             message.push(recipeArray[item + 3]);
             sendMessage = true;
             break;
@@ -295,7 +312,9 @@ if (actions){
                 approvingUsers.push(newUser);
                 message = [];
                 message.push(recipeArray[item]);
-                message.push(recipeArray[item + 2]);
+                console.log("approvingUsers.length: " + approvingUsers.length);
+                zutatenBlock = multiplier.getIngredients(zutaten,item/4, approvingUsers.length +1 );
+                message.push(zutatenBlock);
                 message.push(recipeArray[item + 1]);
                 var lastIndex = approvingUsers.length - 1;
                     channelInvitation[2].text.text += "\n " + "*" + approvingUsers[lastIndex] + "*" +" ist dabei! :carrot:";

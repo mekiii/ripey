@@ -1,0 +1,84 @@
+[
+        [ 
+            {
+                "Zutat": "Walnüsse",
+                "Menge": 60,
+                "Einheit": "g"
+            },
+            {
+                "Zutat": "Endiviensalat",
+                "Menge": 100,
+                "Einheit": "g"
+            },
+            {   "Zutat": "geriebene Karotten",
+                "Menge": 100,
+                "Einheit": "g"
+            },
+            {
+                "Zutat": "Oliven",
+                "Menge": 50,
+                "Einheit": "g"
+            },
+            {   "Zutat": "Zwiebeln",
+                "Menge": 50,
+                "Einheit": "g"
+            },
+            {   
+                "Zutat": "Dressing",
+                "Menge": 20,
+                "Einheit": "g"
+            }
+        ],
+        [
+            {
+                "Zutat": "angebauter Rucola",
+                "Menge": 100,
+                "Einheit": "g"
+            },
+            {
+                "Zutat": "Tomate",
+                "Menge": 1,
+                "Einheit": ""
+            },
+            {
+                "Zutat": "Weißbrote",
+                "Menge": 4,
+                "Einheit": ""
+            },
+            {
+                "Zutat": "frischer Mozzarella",
+                "Menge": 100,
+                "Einheit": "g"
+            },
+             {  "Zutat": "grünes Pesto",
+                "Menge": "",
+                "Einheit": ""
+            }
+        ],
+        [
+            {
+                "Zutat": "Farfalle",
+                "Menge": 200,
+                "Einheit": "g"
+            },
+            {
+                "Zutat": "Parmesan",
+                "Menge": 50,
+                "Einheit": "g"
+            },
+            {
+                "Zutat": "angebaute Kirschtomaten",
+                "Menge": 2,
+                "Einheit": ""
+            },
+            {
+                "Zutat": "Olivenöl",
+                "Menge": "",
+                "Einheit": ""
+            },
+             {  "Zutat": "grünes Pesto",
+                "Menge": "",
+                "Einheit": ""
+            }
+        ]
+    ]
