@@ -11,6 +11,7 @@ let selectedTime;
 let approvingUsers =[];
 let user;
 let mysql = require('mysql');
+let produceIsRipe = false;
 
 //Declare some variables
 let timeStamp;
@@ -34,15 +35,17 @@ var con = mysql.createConnection({
 //Get information of ripeness database 
 con.connect(function(err) {
   if (err) throw err;
-  con.query("SELECT * FROM anbau WHERE id=(SELECT max(id) FROM anbau);", function (err, result, fields) {
+  con.query("SELECT Status FROM anbau WHERE PrimKey = LAST_INSERT_ID()", function (err, result, fields) {
     if (err) throw err;
     console.log("Database output (status): ");
-    console.log(fields.status);
+    console.log("++++++++++++++++++++++++++++++++++++++++" + result);
+    if (result == "reif") {
+        produceIsRipe = true;
+    }
   });
 });
 
 
-//
 async function loadJSON (jsonPath){
 
   var data = await fs.readFileAsync(jsonPath);
