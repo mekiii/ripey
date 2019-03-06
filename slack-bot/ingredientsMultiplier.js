@@ -7,7 +7,13 @@ function getIngredients (zutatenJSON, recipeNum, portions){
 			text: "",
 		}
 	}
-	ingredientsArray.text.text = `*Zutaten:* \n`;
+	if (portions == 1 ){
+		ingredientsArray.text.text = `*Zutaten (für ${portions} Person):* \n`;
+	}
+	else {
+		ingredientsArray.text.text = `*Zutaten (für ${portions} Personen):* \n`;
+	}
+	
 	for (i = 0; i < zutatenJSON[recipeNum].length; i++){
 		if(zutatenJSON[recipeNum][i].Menge != "")
 		zutatenJSON[recipeNum][i].Menge *= portions;

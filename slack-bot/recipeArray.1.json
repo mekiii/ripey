@@ -15,7 +15,7 @@
 		"type": "section",
 		"text": {
 			"type": "mrkdwn",
-			"text": "*Zutaten:* \n- 100g angebauter Endiviensalat\n- 60g Walnüsse\n- 100g geriebene Karotten\n- 50g Oliven\n- 50g Zwiebeln\n- 20g Dressing\n  "
+			"text": ""
 		}
 	},
   {
@@ -41,7 +41,7 @@
 		"type": "section",
 		"text": {
 			"type": "mrkdwn",
-			"text": "*Zutaten:* \n - *100g angebauter Rucola* \n - *1 angebaute Tomate* \n - 4 Weißbrot \n- 100g frischer Mozzarella \n - grünes Pesto"
+			"text": ""
 			}
     },
     {
@@ -67,7 +67,7 @@
 		"type": "section",
 		"text": {
 			"type": "mrkdwn",
-			"text": "*Zutaten* \n - 200g Farfalle \n - 50g Parmesan \n - grünes Pesto \n - *2 angebaute Kirschtomaten* \n - Olivenöl \n"
+			"text": ""
 			}
     },
     {

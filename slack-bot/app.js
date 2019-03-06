@@ -1,31 +1,48 @@
 // Import dependencies
-var express = require('express');
-var request = require('request');
-var bodyParser = require('body-parser');
+let express = require('express');
+let bodyParser = require('body-parser');
 let multiplier = require('./ingredientsMultiplier');
-var app = express();
-var Promise = require('bluebird');
-var fs = Promise.promisifyAll(require('fs'));
-var item = 0;
-var selectedChannel;
-var selectedTime;
-var approvingUsers =[];
+let app = express();
+let Promise = require('bluebird');
+let fs = Promise.promisifyAll(require('fs'));
+let item = 0;
+let selectedChannel;
+let selectedTime;
+let approvingUsers =[];
 let user;
+let mysql = require('mysql');
 
 //Declare some variables
-var timeStamp;
-var invitationTimeStamp;
-var urlencodedParser = bodyParser.urlencoded({ extended: false });
+let timeStamp;
+let invitationTimeStamp;
+let urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 //Get slackclient
 const { WebClient } = require('@slack/client');
-<<<<<<< Updated upstream
-const myToken = "xoxb-447711350823-540306733076-CesxFr4fuWdWidA5X6J1Pdwd";
-=======
-const myToken = "xoxb-447711350823-540306733076-S7Tgjz7DCojjTB24y2qfInHD";
->>>>>>> Stashed changes
+const myToken = "xoxb-447711350823-540306733076-xc0wMIUoLzrZnflQGJVB3bk9";
 const web = new WebClient(myToken);
 
+
+//Prepare database connection 
+var con = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "runmysql",
+  database: "planta"
+});
+
+//Get information of ripeness database 
+con.connect(function(err) {
+  if (err) throw err;
+  con.query("SELECT * FROM anbau WHERE id=(SELECT max(id) FROM anbau);", function (err, result, fields) {
+    if (err) throw err;
+    console.log("Database output (status): ");
+    console.log(fields.status);
+  });
+});
+
+
+//
 async function loadJSON (jsonPath){
 
   var data = await fs.readFileAsync(jsonPath);
@@ -47,8 +64,8 @@ let zutaten;
 })();
 
 
-var notificationPath = "./notification.json";
-var notification;
+let notificationPath = "./notification.json";
+let notification;
 (async () => {
     try {
         notification = await loadJSON(notificationPath);   
@@ -58,8 +75,8 @@ var notification;
     }
 })();
 
-var recipePath = './recipe_message.json';
-var recipeMessage;
+let recipePath = './recipe_message.json';
+let recipeMessage;
 
 (async () => {
     try {
@@ -70,8 +87,8 @@ var recipeMessage;
     }
 })();
 
-var togetherPath = './together_message.json';
-var togetherMessage;
+let togetherPath = './together_message.json';
+let togetherMessage;
 (async () => {
     try {
         togetherMessage = await loadJSON(togetherPath);   
@@ -81,8 +98,8 @@ var togetherMessage;
     }
 })();
 
-var recipeArrayPath = "./recipeArray.1.json";
-var recipeArray;
+let recipeArrayPath = "./recipeArray.1.json";
+let recipeArray;
 (async () => {
     try {
         recipeArray = await loadJSON(recipeArrayPath);  
@@ -93,8 +110,8 @@ var recipeArray;
     }
 })();
 
-var chosenPath = "./chosenRecipes.json";
-var chosenRecipes;
+let chosenPath = "./chosenRecipes.json";
+let chosenRecipes;
 (async () => {
     try {
         chosenRecipes = await loadJSON(chosenPath);   
@@ -104,8 +121,8 @@ var chosenRecipes;
     }
 })();
 
-var lonerPath = "./loner.json";
-var eatingAlone;
+let lonerPath = "./loner.json";
+let eatingAlone;
 (async () => {
     try {
         eatingAlone = await loadJSON(lonerPath);   
@@ -115,8 +132,8 @@ var eatingAlone;
     }
 })();
 
-var cancelMessagePath = "./cancelMessage.json";
-var cancelMessage;
+let cancelMessagePath = "./cancelMessage.json";
+let cancelMessage;
 (async () => {
     try {
         cancelMessage = await loadJSON(cancelMessagePath);   
@@ -127,8 +144,8 @@ var cancelMessage;
 })();
 
 
-var channelSelectionPath = "./channelSelection.json";
-var channelSelection;
+let channelSelectionPath = "./channelSelection.json";
+let channelSelection;
 (async () => {
     try {
         channelSelection = await loadJSON(channelSelectionPath);   
@@ -138,8 +155,8 @@ var channelSelection;
     }
 })();
 
-var channelInvitationPath = "./channelInvitation.json";
-var channelInvitation;
+let channelInvitationPath = "./channelInvitation.json";
+let channelInvitation;
 (async () => {
     try {
         channelInvitation = await loadJSON(channelInvitationPath);   
@@ -150,7 +167,7 @@ var channelInvitation;
 })();
 
 //Get user information
-var userList = [];
+let userList = [];
 web.users.list({token: myToken})
 .then((res) => {
     // `res` contains information about the posted message
@@ -329,6 +346,15 @@ if (actions){
                 })
                 .catch(console.error);
             }
+            message = [];
+            message.push(chosenRecipes[item]);
+            message.push(chosenRecipes[item + 1]);
+            channelSelection[0].text.text = "Dein Vorschlag wurde in deinen ausgewählten Kanal geschickt.\n Hier ist das Rezept:" 
+            message.push(channelSelection[0]);
+            zutatenBlock = multiplier.getIngredients(zutaten,item/4, approvingUsers.length +1);
+            message.push(zutatenBlock);
+            message.push(recipeArray[item + 3]);
+            sendMessage = true;
             break;  
         }
     }
