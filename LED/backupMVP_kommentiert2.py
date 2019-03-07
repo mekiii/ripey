@@ -1,12 +1,11 @@
 # import RPi.GPIO as GPIO
 
 #------------------------------------------------------------------------
-#Start import Script
+#Start importData Script
 #import database at localhost
 import MySQLdb
 global plantState
-global reif
-
+#global reif
 
 db = MySQLdb.connect(host="localhost",    # your host, usually localhost
                      user="root",         # your username
@@ -17,17 +16,10 @@ db = MySQLdb.connect(host="localhost",    # your host, usually localhost
 #  you execute all the queries you need
 cur = db.cursor()
 
-# Use all the SQL you like
-#cur.execute("SELECT * FROM anbau")
-cur.execute("SELECT Status FROM anbau ORDER BY PrimKey DESC LIMIT 1")
+#reif = False
 
-# print all the first cell of all th rows
-plantState = cur.fetchall()[0][0]
-print ("==============================0", plantState)
-   
-reif = False
-
-
+#-------------------------------------------------------
+# Stop 
 
 
 # import RPi.GPIO as GPIO
@@ -104,6 +96,7 @@ def checkKey():
     global yellow
     global raiseColor
 
+"""
     while True:
         c = getCh()
         
@@ -154,7 +147,7 @@ print ("c = Abort Program")
 setLights(RED_PIN, r)
 setLights(GREEN_PIN, g)
 setLights(BLUE_PIN, b)
-
+"""
 raiseColor = 0
     
 def startLedStrip():
@@ -256,11 +249,34 @@ print ("\n Bereit")
 
 # reif = True
 
+
+# Use all the SQL you like
+#cur.execute("SELECT * FROM anbau")
+
+cur.execute("SELECT Status FROM anbau ORDER BY PrimKey DESC LIMIT 1")
+
+# print all the first cell of all th rows
+plantState = cur.fetchall()[0][0]
+print ("==============================0", plantState)
+
+def getPlantState():
+    while round(time.time) % 5:
+        cur.execute("SELECT Status FROM anbau ORDER BY PrimKey DESC LIMIT 1")
+
+        # print all the first cell of all th rows
+        plantState = cur.fetchall()[0][0]
+        print ("==============================0", plantState)
+   
+start_new_thread(getPlantState, ())
+
+
 def checkPlantState():
     while plantState == "reif":
         setGrowLight(True)
         print ("Reif + Bewegung")
         print('\n Es gab eine Bewegung!')
+    else:
+        setGrowLight(False)
         
 start_new_thread(checkPlantState, ())
 
