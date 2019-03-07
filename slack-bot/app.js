@@ -20,7 +20,7 @@ let urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 //Get slackclient
 const { WebClient } = require('@slack/client');
-const myToken = "xoxb-447711350823-540306733076-lvXqHI5OYqs3Z1Ui7FeU3oXp";
+const myToken = "xoxb-447711350823-540306733076-ywhZdcv47CLI8Xkcy7EHIVLy";
 const web = new WebClient(myToken);
 
 
@@ -31,6 +31,24 @@ var con = mysql.createConnection({
   password: "runmysql",
   database: "planta"
 });
+
+
+//Get information of ripeness database 
+
+con.connect(function(err) {
+    if (err) throw err;
+    con.query("SELECT * FROM anbau ORDER BY PrimKey DESC LIMIT 1", function (err, result, fields) {
+      if (err) throw err;
+      console.log("Database output (status): ");
+      if (result[0].Status == "reif") {
+        produceIsRipe = true;
+      }
+      else {
+        produceIsRipe = false;
+      console.log("++++++++++++++++++++++++++++++++++++++++ produceIsRipe: " + produceIsRipe);
+      }
+    });
+  });
 
 async function loadJSON (jsonPath){
 
@@ -182,20 +200,15 @@ web.users.list({token: myToken})
         //var randomIndex = Math.floor((Math.random() * (userList.length - 1)));
         user = userList[1];
         console.log(user.name + ": " + user.channel);
+        if( produceIsRipe) {
+            sendNotification();
+        }
     })
     .catch(console.error);
 })
 .catch(console.error);
 
-let isNotified = true;
 
-
-//Send notification every 10 seconds
-if (produceIsRipe) {
-	console.log("++++++++++++++++++++++++++++++++++++++++ produceIsRipe: " + produceIsRipe);
-}
-
-sendNotification();
 
 //First post ripeness notification
 function sendNotification(){
@@ -212,21 +225,6 @@ function sendNotification(){
     
 }
 
-
-
-//Get information of ripeness database 
-con.connect(function(err) {
-  if (err) throw err;
-  con.query("SELECT * FROM anbau ORDER BY PrimKey DESC LIMIT 1", function (err, result, fields) {
-    if (err) throw err;
-    console.log("Database output (status): ");
-    if (result[0].Status == "reif") {
-    }
-    else {
-	console.log("++++++++++++++++++++++++++++++++++++++++ produceIsRipe: " + produceIsRipe);
-    }
-  });
-});
 
 
 
