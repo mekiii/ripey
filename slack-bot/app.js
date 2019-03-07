@@ -20,7 +20,7 @@ let urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 //Get slackclient
 const { WebClient } = require('@slack/client');
-const myToken = "xoxb-447711350823-540306733076-xc0wMIUoLzrZnflQGJVB3bk9";
+const myToken = "xoxb-447711350823-540306733076-lvXqHI5OYqs3Z1Ui7FeU3oXp";
 const web = new WebClient(myToken);
 
 
@@ -31,20 +31,6 @@ var con = mysql.createConnection({
   password: "runmysql",
   database: "planta"
 });
-
-//Get information of ripeness database 
-con.connect(function(err) {
-  if (err) throw err;
-  con.query("SELECT Status FROM anbau WHERE PrimKey = LAST_INSERT_ID()", function (err, result, fields) {
-    if (err) throw err;
-    console.log("Database output (status): ");
-    console.log("++++++++++++++++++++++++++++++++++++++++" + result);
-    if (result == "reif") {
-        produceIsRipe = true;
-    }
-  });
-});
-
 
 async function loadJSON (jsonPath){
 
@@ -203,8 +189,13 @@ web.users.list({token: myToken})
 
 let isNotified = true;
 
+
 //Send notification every 10 seconds
-    var timer = setInterval(sendNotification, 10000);
+if (produceIsRipe) {
+	console.log("++++++++++++++++++++++++++++++++++++++++ produceIsRipe: " + produceIsRipe);
+}
+
+sendNotification();
 
 //First post ripeness notification
 function sendNotification(){
@@ -216,10 +207,27 @@ function sendNotification(){
             timeStamp = res.ts;
         })
         .catch(console.error);
-        clearInterval(timer);
+        //clearInterval(timer);
     }
     
 }
+
+
+
+//Get information of ripeness database 
+con.connect(function(err) {
+  if (err) throw err;
+  con.query("SELECT * FROM anbau ORDER BY PrimKey DESC LIMIT 1", function (err, result, fields) {
+    if (err) throw err;
+    console.log("Database output (status): ");
+    if (result[0].Status == "reif") {
+    }
+    else {
+	console.log("++++++++++++++++++++++++++++++++++++++++ produceIsRipe: " + produceIsRipe);
+    }
+  });
+});
+
 
 
 // Start server on port 3000
