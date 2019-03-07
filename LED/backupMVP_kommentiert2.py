@@ -147,6 +147,7 @@ print ("c = Abort Program")
 setLights(RED_PIN, r)
 setLights(GREEN_PIN, g)
 setLights(BLUE_PIN, b)
+
 """
 raiseColor = 0
     
@@ -257,7 +258,7 @@ cur.execute("SELECT Status FROM anbau ORDER BY PrimKey DESC LIMIT 1")
 
 # print all the first cell of all th rows
 plantState = cur.fetchall()[0][0]
-print ("==============================0", plantState)
+print ("==============================", plantState)
 
 def getPlantState():
     while round(time.time) % 5:
@@ -265,7 +266,7 @@ def getPlantState():
 
         # print all the first cell of all th rows
         plantState = cur.fetchall()[0][0]
-        print ("==============================0", plantState)
+        print ("==============================", plantState)
    
 start_new_thread(getPlantState, ())
 
