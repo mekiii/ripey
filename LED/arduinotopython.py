@@ -1,4 +1,4 @@
-import hw_timer.h     
+#import hw_timer.c     
 
 zcPin = 35
 pwmPin = 37; 
@@ -9,7 +9,7 @@ tarBrightness = 255
 curBrightness = 0
 # 0 = ready; 1 = processing
 zcState = 0
-
+print "DimmerCode is Ready"
 
 def setup():
   #Serial.begin(115200);   
@@ -23,12 +23,13 @@ def setup():
 
 
 def loop():
+    print("loop")
   # put your main code here, to run repeatedly:
-    if (Serial.available()):
-        int val = Serial.parseInt()
-        if (val>0):
-          tarBrightness =val
-          Serial.println(tarBrightness)
+    #if (Serial.available()):
+    val = Serial.parseInt()
+    if (val>0):
+        tarBrightness =val
+        print(tarBrightness)
         
         
     
@@ -36,12 +37,17 @@ def loop():
 
 
 def dimTimerISR():
+    global curBrightness
+    global status
+    
+    print("dimTimerISR")
     if (fade == 1):
       if (curBrightness > tarBrightness or (status == 0 and curBrightness > 0)):
         curBrightness -=1
       
       elif (curBrightness < tarBrightness and status == 1 and curBrightness < 255):
         curBrightness +=1
+        
       
     
     else:
@@ -55,27 +61,29 @@ def dimTimerISR():
     
     if (curBrightness == 0):
       status = 0
-      digitalWrite(pwmPin, 0)
+      pwmPin = 0
     
     elif (curBrightness == 255):
       status = 1
-      digitalWrite(pwmPin, 1)
+      pwmPin = 1
     
     else:
-      digitalWrite(pwmPin, 1)
+      pwmPin = 1
     
     
     zcState = 0
 
 
 def zcDetectISR():
-  if (zcState == 0):
-    zcState = 1
+    print("zcDetect")
+    if (zcState == 0):
+      zcState = 1
   
-    if (curBrightness < 255 and curBrightness > 0):
-      digitalWrite(pwmPin, 0)
+      if (curBrightness < 255 and curBrightness > 0):
+        digitalWrite(pwmPin, 0)
       
-      int dimDelay = 30 * (255 - curBrightness) + 400;//400
-      hw_timer_arm(dimDelay)
-    
+        dimDelay = 30 * (255 - curBrightness) + 400
+        hw_timer_arm(dimDelay)
+
+dimTimerISR()
   

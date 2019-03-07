@@ -20,7 +20,7 @@ let urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 //Get slackclient
 const { WebClient } = require('@slack/client');
-const myToken = "xoxb-447711350823-540306733076-ywhZdcv47CLI8Xkcy7EHIVLy";
+const myToken = "xoxb-447711350823-540306733076-N10QKYzf4NqfRuDbaMg513NW";
 const web = new WebClient(myToken);
 
 
@@ -42,6 +42,7 @@ con.connect(function(err) {
       console.log("Database output (status): ");
       if (result[0].Status == "reif") {
         produceIsRipe = true;
+	console.log("++++++++++++++++++++++++++++++++++++++++ produceIsRipe: " + produceIsRipe);
       }
       else {
         produceIsRipe = false;

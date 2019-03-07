@@ -13,16 +13,17 @@ db = MySQLdb.connect(host="localhost",    # your host, usually localhost
 cur = db.cursor()
 
 # Use all the SQL you like
-#cur.execute("SELECT * FROM anbau")
-cur.execute("SELECT Status FROM anbau ORDER BY PrimKey DESC LIMIT 1")
+cur.execute("SELECT * FROM anbau")
+cur.execute("SELECT Status FROM anbau WHERE PrimKey = LAST_INSERT_ID()")
 
 # print all the first cell of all th rows
-plantState = cur.fetchall()[0][0]
-print ("==============================0", plantState)
+for row in cur.fetchall():
+    print row
+    plantState = row
    
     
 
-#db.close()
+db.close()
 # -----------------------------------------------------
 RED_PIN   = 17
 GREEN_PIN = 22
@@ -197,7 +198,7 @@ def key_functions():
                 setLights(GREEN_PIN, g)
                 b = updateColor(b, -0.5 * STEPS)
                 setLights(BLUE_PIN, b)
-                #print (r)
+                print (r)
                 if g <= 5:
                     raiseColor = 1
                     # print ("raiseColor = 1")
@@ -207,7 +208,7 @@ def key_functions():
                 setLights(RED_PIN, r)
                 r = updateColor(r, 0.5 * STEPS)
                 setLights(RED_PIN, r)
-                #print ("yellow =", r ,g)
+                print ("yellow =", r ,g)
                 g = updateColor(g, STEPS)
                 setLights(GREEN_PIN, g)
                 b = updateColor(b, 0.5 * STEPS)
@@ -222,7 +223,9 @@ def key_functions():
     setLights(BLUE_PIN, 255)
     print (b)
         
-       
+
+
+        
 
 ####################### RELAIS SCRIPT START
 def startRelais(): 
@@ -260,9 +263,6 @@ def mein_callback(channel):
     # Start Light
     start_new_thread(key_functions, ())
     print('Es gab eine Bewegung!')
-    print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<", plantState)
-    if plantState == "reif":
-        print ("Reif + Bewegung")
    
 try:
     GPIO.add_event_detect(SENSOR_PIN , GPIO.RISING, callback=mein_callback)
@@ -285,7 +285,6 @@ print (b , r)
 time.sleep(0.5)
 
 pi.stop()#
-
 
 
 
