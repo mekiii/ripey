@@ -139,11 +139,11 @@ def setGrowLight(not_active):
     GPIO.setup(relais, GPIO.OUT)
     
     if not_active:
-        print ("\n set Relais to LOW to start Ventilator")
+        print ("Growlight is OFFFFFFFFF")
         GPIO.output(relais, GPIO.LOW)
     
     else:
-        print ("\n set Relais to HIGH to stop Ventilator")
+        print ("Growlight is OOOOOOOOON")
         GPIO.output(relais, GPIO.HIGH)   
 ####################### STOP GROWLIGHT SCRIPT END
 
