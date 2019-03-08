@@ -1,58 +1,74 @@
 <!--<?php phpinfo ();?>-->
 
+
+<!--Beginn HTML-->
 <html>
 
 <head>
   <meta charset="UTF-8">
 
+  <!--/////////////////////////////////////////////////////////////////////////-->
+  <!--Load sources-->
 
-
-  <!--<Lädt die JQuery Datenbank aus dem Source-Ordner>-->
+  <!--Load JQuery library from source directory-->
   <script src="source/jquery.min.js"></script>
-  
-  <!--<Lädt Daten zum neuralen Netzwerk aus dem Source-Ordner>-->
+
+  <!--Load ML5 files from source directory-->
   <script src="source/p5.min.js"></script>
   <script src="source/p5.dom.min.js"></script>
-  <script src="source/ml5.min.js" type="text/javascript"></script> 
-  
-  <!--<Lädt die sketch.js-Datei>-->
+  <script src="source/ml5.min.js" type="text/javascript"></script>
+
+  <!--Load functions for buttons and commants for database from source directory-->
   <script src="sketch.js"></script>
+  <!--/////////////////////////////////////////////////////////////////////////-->
 
 </head>
 
 <body>
 
-    <!--Erstellt ein Überschrift, welche das Resultat aus der Bildanalyse ausgibt-->
+    <!--/////////////////////////////////////////////////////////////////////////-->
+    <!--Creating headline for result of vision detection-->
     <h1 id="Ergebnis"></h1>
+    <!--/////////////////////////////////////////////////////////////////////////-->
+
 
     <!--/////////////////////////////////////////////////////////////////////////-->
-    <!--/////////////////////////////////////////////////////////////////////////-->
-    <!--BUTTONS-->
+    <!--Creating buttons-->
 
-    <!--Erstellt einen Button, zum erstellen der Bilder von reifen Tomaten-->
+    <!--Creating button to creating an image of a ripe tomato-->
     <button id="ripetomatoButton">Tomate reif(<span id="ripetomatoCounter">0</span>)</button>
 
-    <!--Erstellt einen Button, zum erstellen der Bilder von unreifen Tomaten-->
+    <!--Creating button to creating an image of an unripe tomato-->
     <button id="unripetomatoButton">Tomate unreif (<span id="unripetomatoCounter">0</span>)</button>
 
-    <!--Erstellt einen Button, zum erstellen der Bilder von reifem Salat-->
+    <!--Creating button to creating an image of a ripe salad-->
     <button id="ripesalatButton">Salat reif (<span id="ripesalatCounter">0</span>)</button>
-    
-    <!--Erstellt einen Button, zum erstellen der Bilder von unreifem Salat-->
+
+    <!--Creating button to creating an image of an unripe tomato-->
     <button id="unripesalatButton">Salat unreif (<span id="unripesalatCounter">0</span>)</button>
-    
+
+    <!--Creating button to train a model for vision detection-->
     <button id="trainingButton">Trainieren</button>
-    <button id="guessButton">Was ist es?</button>
-    
+
+    <!--Creating button to save and download the model-->
     <button id="saveButton">Speichern</button>
 
+    <!--Creating button to show the result of vision detection-->
+    <button id="guessButton">Was ist es?</button>
+
+    <!--/////////////////////-->
+    <!--Database buttons-->
+
+    <!--Creating button to start the write process for writing in database-->
     <button id="insertButton">Schreibvorgang starten</button>
 
+    <!--Creating button to stop the write process for writing in database-->
     <button id="stopButton">Schreibvorgang stoppen</button>
-    
-    <!--<h6><span id="modelStatus">Loading base model...</span></h6>-->
-    
-    
+
+    <!--/////////////////////-->
+    <!--/////////////////////////////////////////////////////////////////////////-->
+
 </body>
 
 </html>
+<!--End HTML-->
