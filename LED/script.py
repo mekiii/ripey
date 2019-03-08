@@ -40,7 +40,7 @@ GREEN_PIN = 22  # GREEN_PIN is on GPIO.PIN 22
 BLUE_PIN  = 24  # BLUE_PIN is on GPIO.PIN 24 
 
 # Number of color changes per step (more is faster, less is slower). You also can use 0.X floats.
-STEPS     = 0.05
+STEPS     = 0.5
 # execute terminal command and start pigpiod
 
 
@@ -125,25 +125,6 @@ def startLedStrip():
 
 
 
-####################### VENTILATOR SCRIPT START
-#def startVentilator(bool):
-#
-#    #import RPi.GPIO as GPIO
-#    GPIO.setmode(GPIO.BCM)
-#    ## spreche GPIO pin 14 an
-#    relais = 14
-#    #t_end = time.time() + 5
-#    #if time.time() < t_end:
-#    GPIO.setmode(GPIO.BCM)
-#    GPIO.setup(relais, GPIO.OUT)
-#    
-#    #print ("\n set Relais to LOW to start Ventilator")
-#    GPIO.output(relais, GPIO.LOW)
-#    time.sleep(5)
-#    
-#    #print ("\n set Relais to HIGH to stop Ventilator")
-#    GPIO.output(relais, GPIO.HIGH)   
-####################### VENTILATOR SCRIPT END
 
 ####################### STOP GROWLIGHT SCRIPT START
 def setGrowLight(not_active): 
@@ -194,7 +175,6 @@ def checkPlantState():
     else:
         setGrowLight(False)
         
-start_new_thread(checkPlantState, ())
 
 ####### START PIR
 SENSOR_PIN = 23
@@ -229,7 +209,7 @@ while True:
     checkPlantState()
     #DatabaseIsFetched = False
     
-    if GPIO.input(SENSOR_PIN) == 1:
+    if GPIO.input(SENSOR_PIN) == 1 and plantState =='reif':
         VentilatorisOn = True;
         LEDisOn = True;
     
