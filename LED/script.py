@@ -8,6 +8,7 @@ import tty
 import pigpio
 import time
 from thread import start_new_thread
+import RPi.GPIO as GPIO
 #------------------------------------------------------------------------
 #Start importData Script
 #import database at localhost
@@ -125,23 +126,23 @@ def startLedStrip():
 
 
 ####################### VENTILATOR SCRIPT START
-def startVentilator(bool):
-
-    #import RPi.GPIO as GPIO
-    GPIO.setmode(GPIO.BCM)
-    ## spreche GPIO pin 14 an
-    relais = 14
-    #t_end = time.time() + 5
-    #if time.time() < t_end:
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(relais, GPIO.OUT)
-    
-    #print ("\n set Relais to LOW to start Ventilator")
-    GPIO.output(relais, GPIO.LOW)
-    time.sleep(5)
-    
-    #print ("\n set Relais to HIGH to stop Ventilator")
-    GPIO.output(relais, GPIO.HIGH)   
+#def startVentilator(bool):
+#
+#    #import RPi.GPIO as GPIO
+#    GPIO.setmode(GPIO.BCM)
+#    ## spreche GPIO pin 14 an
+#    relais = 14
+#    #t_end = time.time() + 5
+#    #if time.time() < t_end:
+#    GPIO.setmode(GPIO.BCM)
+#    GPIO.setup(relais, GPIO.OUT)
+#    
+#    #print ("\n set Relais to LOW to start Ventilator")
+#    GPIO.output(relais, GPIO.LOW)
+#    time.sleep(5)
+#    
+#    #print ("\n set Relais to HIGH to stop Ventilator")
+#    GPIO.output(relais, GPIO.HIGH)   
 ####################### VENTILATOR SCRIPT END
 
 ####################### STOP GROWLIGHT SCRIPT START
@@ -196,7 +197,6 @@ def checkPlantState():
 start_new_thread(checkPlantState, ())
 
 ####### START PIR
-import RPi.GPIO as GPIO
 SENSOR_PIN = 23
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(SENSOR_PIN, GPIO.IN)
@@ -204,28 +204,34 @@ GPIO.setup(SENSOR_PIN, GPIO.IN)
 print ("\n Bereit")
 
 def motionDetected(channel):
-    VentilatorisOn = True;
     LEDisOn = True;
-    print ("motionDetected")
+    VentilatorisOn = True;
 
 
 while True:
     
-    if time.time()*10%5 == 0:
-        DatabaseIsFetched = True
+    #if time.time()%1 == 0:
+        #DatabaseIsFetched = True
         
-    if DatabaseIsFetched == True:
-        cur.execute("SELECT Status FROM anbau ORDER BY PrimKey DESC LIMIT 1")
-        # print all the first cell of all th rows
-        plantState = cur.fetchall()[0][0]
-        print ("==============================", plantState)
-        checkPlantState()
-        DatabaseIsFetched = False
+    #if DatabaseIsFetched == True:
+    db = MySQLdb.connect(host="localhost",    # your host, usually localhost
+                user="root",         # your username
+                passwd="runmysql",  # your password
+                db="planta")        # name of the data base
+
+    # you must create a Cursor object. It will let
+    #  you execute all the queries you need
+    cur = db.cursor()
+    cur.execute("SELECT Status FROM anbau ORDER BY PrimKey DESC LIMIT 1")
+    # print all the first cell of all th rows
+    plantState = cur.fetchall()[0][0]
+    print ("==============================", plantState)
+    checkPlantState()
+    #DatabaseIsFetched = False
     
     if GPIO.input(SENSOR_PIN) == 1:
         VentilatorisOn = True;
         LEDisOn = True;
-        print ("motionDetected")
     
     if VentilatorisOn == True:
         t_end = time.time() + 5
