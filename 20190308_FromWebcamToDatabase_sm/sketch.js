@@ -1,92 +1,99 @@
 
+// Global Variables
 
-//Variable die die Bildeingabe festlegt
-var Webcam;
-
-//Variable die das Endergebnis beinhalten wird
-var ErgebnisForDatabase="";
-
-/////////////////////////////////////////////////////
-//Variablen der neuralen Netzwerke///////////////////
-
-//Lehrer trainiert, weiß was zu tun ist
-var featureExtractor;
-
-//Schüler lernt vom Lehrer was zu tun ist kann aber auch neues lernen
-var klassifizierer; 
-
-/////////////////////////////////////////////////////
-//Hier werden die Namen der Buttons festgelegt///////
-
-var buttonTomateReif;   //Button zur Tomate
-var buttonTomateUnreif;     //Button zur Kiwi
-var buttonSalatReif;    //Button zum Salat
-var buttonSalatUnreif; //Button zum Salatrio
-
-var buttonTraining; //Button zum trainieren des Netzwerkes
-var buttonTipp;     //Button zum Ausgeben der Lösung
-
-//var buttonSave;     //Button zum Speichern des Models
-//var buttonLoad;     //Button zum laden des Models
-
-/////////////////////////////////////////////////////
-//Hier werden Variablen für Counter festgelegt, die die Anzahl von geshossenen Bildern der Nahrungsmittel zählen
-
-var tomateReifCounter = 0;     //Zählt Bilder von Tomaten
-var tomateUnreifCounter = 0;        //Zählt Bilder von Kiwis
-var salatReifCounter = 0;       //Zählt Bilder von Salat
-var salatUnreifCounter = 0;    //Zählt Bilder von Salatrio
+var Webcam; // Variable for incoming vision
+var ErgebnisForDatabase=""; // Variable for incoming vision
 
 var databaseOpen = false;
+////////////////////////////////////////
 
 
-/////////////////////////////////////////////////////
-//Diese Funktion sagt später Bescheid ob das Model geladen hat
+////////////////////////////////////////
+// Variables of neural networks
+
+var featureExtractor; // "Teacher who knows how to lern"
+var klassifizierer; // Student who learns from teacher but also can learn new things"
+////////////////////////////////////////
+
+
+////////////////////////////////////////
+// Variables to naming the buttons on index.php
+
+var buttonTomateReif; // Button for ripe tomato
+var buttonTomateUnreif; // Button for unripe tomato
+var buttonSalatReif; // Button for ripe salad
+var buttonSalatUnreif; // Button for unripe salad
+
+var buttonTraining; // Button to train the neural network
+var buttonTipp; // Button to show the result of vision detection
+var buttonSave; // Button to save and download the model of neural network training
+////////////////////////////////////////
+
+
+////////////////////////////////////////
+// Variables to count created images
+
+var tomateReifCounter = 0; // Counter for ripe tomatos
+var tomateUnreifCounter = 0; // Counter for unripe tomatos
+var salatReifCounter = 0; // Counter for ripe salad
+var salatUnreifCounter = 0; // Counter for unripe salad
+////////////////////////////////////////
+
+
+////////////////////////////////////////
+// Function to show if model is successfully loaded
 
 function modelIsLoaded(){
-    console.log("Model wurde erfolgreich geladen.");
+    console.log("ML5 - Lehrerfunktion wurde erfolgreich geladen.");
 }
+////////////////////////////////////////
 
-/////////////////////////////////////////////////////
-//Diese Funktion lädt die Datei - model.jsn -////////
+
+////////////////////////////////////////
+// Function for loading the model
 
 function classifierReady(){
     console.log("Ready")
     klassifizierer.load("./model/model.json", modelHasLoaded);
 }
+////////////////////////////////////////
 
-//Diese Funktion gibt Bescheid dass die Datei - model.json - geladen wurde und beschreibt die Buttons mit Logik
+
+////////////////////////////////////////
+// Function to show that - model.json - successfully loaded and load button functions
 
 function modelHasLoaded(){
     console.log("Model wurde erfolgreich geladen, jetzt kann es losgehen1");
-    setupButtons(); //Funktion zum beladen der Buttons mit Logik
+    setupButtons(); // Load functions of buttons
 }
+////////////////////////////////////////
 
-////////////////////////////////////////////////////
-//Funktion zur Anzeige des Ergebnisses//////////////
+
+////////////////////////////////////////
+// Function to set and show results
 
 function ergebnisseAnzeigen(error, ergebnisse){
-    
-    ErgebnisForDatabase=ergebnisse;
 
-    console.log(ergebnisse); //Gibt das Ergebnis in der Konsole aus
-    
-    select('#Ergebnis').html(ergebnisse);   //Wählt h1=Ergebnis aus der Indes.html aus und befüllt sie mit dem Ergebnis
-
-    klassifizierer.classify(ergebnisseAnzeigen);    // ruft selbe funktion wieder auf also ein dauerloop
+    ErgebnisForDatabase=ergebnisse; // Set ErgebnisForDatabase to result of vision detection
+    console.log(ErgebnisForDatabase); // Prints result
+    select('#Ergebnis').html(ErgebnisForDatabase); // Select h1=Ergebnis of Index.html and fills it with result
+    klassifizierer.classify(ergebnisseAnzeigen); // Begin to loop the function
 }
+////////////////////////////////////////
 
 
+////////////////////////////////////////
+// Function to insert the result into database
 function insertInDatabase(){
 	if (databaseOpen == true) {
 
-	var parts = ErgebnisForDatabase.split(" ");
-    		var plant = parts[0];
-    		var state = parts[1];
+	var parts = ErgebnisForDatabase.split(" ");  // Splitting the result string on space
+    		var plant = parts[0]; // Set variable for first split
+    		var state = parts[1]; // Set variable for second split
 
-    		//var d = Date(Date.now());
-    		//var time = d.toString();
 
+        ////////////////////////////////////////
+        // Variables to set time
     		var heute = new Date();
     		var day = heute.getDay();
     		var month = heute.getMonth();
@@ -96,7 +103,11 @@ function insertInDatabase(){
     		var sekunden = heute.getSeconds();
 
     		var time = day+'.'+month+'.'+year+' '+stunden+':'+minuten+':'+sekunden;
+        ////////////////////////////////////////
 
+
+        ////////////////////////////////////////
+        // Post values of variables to database.php
     		$.ajax({
     			type:'POST',
     			url:'database.php',
@@ -105,62 +116,71 @@ function insertInDatabase(){
     				alert(response);
     			}
     		});
-    
+        ////////////////////////////////////////
 
-    setTimeout(function() { insertInDatabase(); }, 10000);
+
+    setTimeout(function() { insertInDatabase(); }, 10000); // Set timeout to 10 Sekonds
 }
 }
-
-//Setup
-//Update
 
 ///////////////////////////////////////////////////
-//Hier wird die Logik der Buttons geschrieben//////
+// Button functions
 function setupButtons(){
-    
-    //Logik zum Tomatenbutton
+
+    ////////////////////////////////////////////////////
+    // Tomato ripe button
     buttonTomateReif = select('#ripetomatoButton');
     buttonTomateReif.mousePressed(function(){
         console.log("Tomate reif gedrückt");
-        
-        //Bild der Webcam machen und an Neuronales Netzwerk=NN geben
+
+        // Shoot image an give it to neural network
         klassifizierer.addImage('Tomate reif');
-        tomateReifCounter++;   //Zählt den Bildcounter hoch
+        tomateReifCounter++;
         console.log("Bild geschossen!");
         select('#ripetomatoCounter').html(tomateReifCounter);
     });
-    
+
+    ////////////////////////////////////////////////////
+    // Tomato unripe button
     buttonTomateUnreif = select('#unripetomatoButton');
     buttonTomateUnreif.mousePressed(function(){
         console.log("Tomate unreif gedrückt");
-        //Ab hier kommt die Logik also die Funktionalität des Buttons
-        //Bild der Webcam machen und an Neuronales Netzwerk, NN geben
+
+        // Shoot image an give it to neural network
         klassifizierer.addImage('Tomate unreif');
         tomateUnreifCounter++;
         console.log("Bild geschossen!");
         select('#unripetomatoCounter').html(tomateUnreifCounter);
     });
-    
+
+    ////////////////////////////////////////////////////
+    // Salad ripe button
     buttonSalatReif = select('#ripesalatButton');
     buttonSalatReif.mousePressed(function(){
         console.log("Salat reif gedrückt");
+
+        // Shoot image an give it to neural network
         klassifizierer.addImage('Salat reif');
         salatReifCounter++;
         console.log("Bild geschossen!");
-        //Zählt die Anzahl der Bilder von Salat hoch
         select('#ripesalatCounter').html(salatReifCounter);
     });
-    
+
+    ////////////////////////////////////////////////////
+    // Salad unripe button
     buttonSalatUnreif = select('#unripesalatButton');
     buttonSalatUnreif.mousePressed(function(){
         console.log("Salat unreif gedrückt");
+
+        // Shoot image an give it to neural network
         klassifizierer.addImage('Salat unreif');
         salatUnreifCounter++;
         console.log("Bild geschossen!");
-        //Zählt die Anzahl der Bilder von Salat hoch
         select('#unripesalatCounter').html(salatUnreifCounter);
     });
-    
+
+    ////////////////////////////////////////////////////
+    // Train button ist training the model
     buttonTraining = select('#trainingButton');
     buttonTraining.mousePressed(function(){
         klassifizierer.train(function(TrainingIsDone){
@@ -173,19 +193,25 @@ function setupButtons(){
             });
         console.log("Trainingsbutton gedrückt");
     });
-    
+
+    ////////////////////////////////////////////////////
+    // Button to start ergebnisseAnzeigen function
     buttonTipp = select('#guessButton');
     buttonTipp.mousePressed(function(){
-        
+
         klassifizierer.classify(ergebnisseAnzeigen);
         console.log("Antwortbutton gedrückt");
     });
-    
+
+    ////////////////////////////////////////////////////
+    // Button to save the model
     buttonSave = select('#saveButton');
     buttonSave.mousePressed(function(){
         klassifizierer.save();
     });
 
+    ////////////////////////////////////////////////////
+    // Button to start insertInDatabase function
     buttonInsert = select('#insertButton');
     buttonInsert.mousePressed(function(){
     	console.log("Schreibvorgangstart gedrückt");
@@ -195,41 +221,43 @@ function setupButtons(){
     	insertInDatabase();
     });
 
+    ////////////////////////////////////////////////////
+    // Button to stop insertInDatabase function
     buttonStop = select('#stopButton');
     buttonStop.mousePressed(function(){
     	console.log("Schreibvorgangstopp gedrückt");
-			
+
 			databaseOpen = false;
 
     	});
-    
-   /* buttonLoad = select('#loadButton');
-    buttonLoad.changed(function(){
-        klassifizierer.load(buttonLoad.elt.files, function(){
-            select('#modelStatus').html('Custom Model loaded!');
-        });
-    
-    });*/
+
 }
+
 
 ////////////////////////////////////////////////////
-//Im Setup werden Funktionen ausgeführt
-function setup(){
-    
-    console.log("Setup aufgerufen");
-    
-    noCanvas(); //Hier wird festgelegt, dass es keine Rahmen gibt
-    
-    Webcam = createCapture(VIDEO); //Die Webcam Variable wird festgelegt.
-    Webcam.size(320, 240);
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
+// SETUP - SETUP - SETUP - SETUP - SETUP - SETUP
 
-    //Erstes Neuronales Netzwerk, Lehrer
+function setup(){
+
+    console.log("Setup aufgerufen");
+
+    noCanvas(); // Set no Canvas
+
+    Webcam = createCapture(VIDEO); // Defines Webcam variable
+    Webcam.size(320, 240); // Defines Webcam size
+
+    ////////////////////////////////////////////////////
+    // First neural netwok = teacher
     featureExtractor = ml5.featureExtractor('MobileNet', modelIsLoaded); //Hier wird der featureExtractor beschrieben, bescheidgegeben und das "Wissen" von ml5. geladen
-    
-    //Anzahl der möglichen Ergebnisse wird hier angegeben 
-    featureExtractor.numClasses= 4; 
-    
-    //Zweites neurales Netzwerk, Schüler
+    featureExtractor.numClasses= 4; // 4 is defining the number of classifications of the images
+
+    ////////////////////////////////////////////////////
+    // Second neural netwok = student
     klassifizierer = featureExtractor.classification(Webcam,classifierReady);
-    
+
 }
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
