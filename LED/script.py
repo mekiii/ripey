@@ -1,10 +1,25 @@
 # import RPi.GPIO as GPIO
+import os
+#os.system("sudo pigpiod")
 
+import sys
+import termios
+import tty
+import pigpio
+import time
+from thread import start_new_thread
 #------------------------------------------------------------------------
 #Start importData Script
 #import database at localhost
 import MySQLdb
 global plantState
+ventilatorRelais = 14
+VentilatorisOn = False
+LEDisOn = False
+DatabaseIsFetched = False
+t_end = 0
+t_led_end = 0
+
 #global reif
 
 db = MySQLdb.connect(host="localhost",    # your host, usually localhost
@@ -15,23 +30,6 @@ db = MySQLdb.connect(host="localhost",    # your host, usually localhost
 # you must create a Cursor object. It will let
 #  you execute all the queries you need
 cur = db.cursor()
-
-
-#-------------------------------------------------------
-# Stop 
-
-
-# import RPi.GPIO as GPIO
-import os
-#os.system("sudo pigpiod")
-
-import sys
-import termios
-import tty
-import pigpio
-import time
-from thread import start_new_thread
-
 
 
 
@@ -73,81 +71,6 @@ def setLights(pin, brightness):
     realBrightness = int(int(brightness) * (float(bright) / 255.0))
     pi.set_PWM_dutycycle(pin, realBrightness)
 
-
-def getCh():
-    fd = sys.stdin.fileno()
-    old_settings = termios.tcgetattr(fd)
-    
-    try:
-        tty.setraw(fd)
-        ch = sys.stdin.read(1)
-    finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-        
-    return ch
-
-
-def checkKey():
-    global bright
-    global brightChanged
-    global state
-    global abort
-    global yellow
-    global raiseColor
-
-"""
-    while True:
-        c = getCh()
-        
-        if c == '+' and bright < 255 and not brightChanged:
-            brightChanged = True
-            time.sleep(0.1)
-            brightChanged = False
-            
-            bright = bright + 0.1
-            print ("Current brightness: %d" % bright)
-            
-        if c == '-' and bright > 0 and not brightChanged:
-            brightChanged = True
-            time.sleep(0.1)
-            brightChanged = False
-            
-            bright = bright - 0.01
-            print ("Current brightness: %d" % bright)
-            
-        if c == 'p' and state:
-            state = False
-            print ("Pausing...")
-            
-            time.sleep(0.1)
-            setLights(RED_PIN, 0)
-            setLights(GREEN_PIN, 0)
-            
-        if c == 'w' and not state:
-            state = True
-            print ("weiter...")
-            
-        if c == 'y':
-            yellow = True
-            
-            print ("yellow = true")            
-        
-        if c == 'c' and not abort:
-            yellow = False
-            abort = True
-            break
-
-start_new_thread(checkKey, ())
-
-print ("+ / - = Increase / Decrease brightness")
-print ("p / w = Pause / weiter")
-print ("c = Abort Program")
-
-setLights(RED_PIN, r)
-setLights(GREEN_PIN, g)
-setLights(BLUE_PIN, b)
-
-"""
 raiseColor = 0
     
 def startLedStrip():
@@ -198,14 +121,18 @@ def startLedStrip():
     setLights(RED_PIN, 0)
     setLights(GREEN_PIN, 0)
     setLights(BLUE_PIN, 0)
-        
+
+
+
 ####################### VENTILATOR SCRIPT START
-def startVentilator(): 
+def startVentilator(bool):
+
     #import RPi.GPIO as GPIO
     GPIO.setmode(GPIO.BCM)
     ## spreche GPIO pin 14 an
     relais = 14
-    
+    #t_end = time.time() + 5
+    #if time.time() < t_end:
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(relais, GPIO.OUT)
     
@@ -223,8 +150,8 @@ def setGrowLight(not_active):
     GPIO.setmode(GPIO.BCM)
     ## spreche GPIO pin 15 an
     relais = 15
-    while round(time.time()) % 5:
-        print('\n xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx stop growlight!')
+    #while round(time.time()) % 2 == 0:
+        #print('\n xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx stop growlight!')
     
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(relais, GPIO.OUT)
@@ -240,17 +167,6 @@ def setGrowLight(not_active):
 
 
 
-####### START PIR
-import RPi.GPIO as GPIO
-SENSOR_PIN = 23
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(SENSOR_PIN, GPIO.IN)
-
-print ("\n Bereit")
-
-# reif = True
-
-
 # Use all the SQL you like
 #cur.execute("SELECT * FROM anbau")
 
@@ -261,59 +177,117 @@ plantState = cur.fetchall()[0][0]
 print ("==============================", plantState)
 
 def getPlantState():
-    while round(time.time()) % 5:
+    if round(time.time()) % 5 == 0 :
         cur.execute("SELECT Status FROM anbau ORDER BY PrimKey DESC LIMIT 1")
 
         # print all the first cell of all th rows
         plantState = cur.fetchall()[0][0]
         print ("==============================", plantState)
    
-start_new_thread(getPlantState, ())
+#start_new_thread(getPlantState, ())
 
 
 def checkPlantState():
-    while plantState == "reif":
+    if plantState == "reif":
         setGrowLight(True)
-        print ("Reif + Bewegung")
-        print('\n Es gab eine Bewegung!')
     else:
         setGrowLight(False)
         
 start_new_thread(checkPlantState, ())
 
-#if reif == True:
-#    start_new_thread(stopGrowLight, ())
-#    print('\n reif == true, stop growlight!')
+####### START PIR
+import RPi.GPIO as GPIO
+SENSOR_PIN = 23
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(SENSOR_PIN, GPIO.IN)
 
-def mein_callback(channel):
-    # Start ventilator (relais).
-    start_new_thread(startVentilator, ())
-    # Start Light
-    start_new_thread(startLedStrip, ())
-    print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<", plantState)
+print ("\n Bereit")
+
+def motionDetected(channel):
+    VentilatorisOn = True;
+    LEDisOn = True;
+    print ("motionDetected")
+
+
+while True:
     
-   
+    if time.time()*10%5 == 0:
+        DatabaseIsFetched = True
+        
+    if DatabaseIsFetched == True:
+        cur.execute("SELECT Status FROM anbau ORDER BY PrimKey DESC LIMIT 1")
+        # print all the first cell of all th rows
+        plantState = cur.fetchall()[0][0]
+        print ("==============================", plantState)
+        checkPlantState()
+        DatabaseIsFetched = False
+    
+    if GPIO.input(SENSOR_PIN) == 1:
+        VentilatorisOn = True;
+        LEDisOn = True;
+        print ("motionDetected")
+    
+    if VentilatorisOn == True:
+        t_end = time.time() + 5
+        VentilatorisOn = False
+    
+    if time.time() < t_end:
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(ventilatorRelais, GPIO.OUT)
+        
+        #print ("\n set Relais to LOW to start Ventilator")
+        GPIO.output(ventilatorRelais, GPIO.LOW)
+    else:
+        #print ("\n set Relais to HIGH to stop Ventilator")
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(ventilatorRelais, GPIO.OUT)
+        GPIO.output(ventilatorRelais, GPIO.HIGH)
+    
+    ######
+    if LEDisOn == True:
+        t_led_end = time.time() + 9
+        LEDisOn = False
+        
+    if time.time() < t_led_end:
+        if state and not brightChanged:
+            # light go out
+            if raiseColor == 0:
+                r = updateColor(r, -STEPS)
+                setLights(RED_PIN, r)
+                r = updateColor(r, -STEPS)
+                setLights(RED_PIN, r)
+                g = updateColor(g, -STEPS)
+                setLights(GREEN_PIN, g)
+                b = updateColor(b, -0.5 * STEPS)
+                setLights(BLUE_PIN, g)
+                #print ("\n", r)
+                if g <= 5:
+                    raiseColor = 1
+                    # print ("raiseColor = 1")
+            #light go on
+            if raiseColor == 1:
+                r = updateColor(r, STEPS)
+                setLights(RED_PIN, r)
+                r = updateColor(r, STEPS)
+                setLights(RED_PIN, r)
+                #print ("yellow =", r ,g)
+                g = updateColor(g, STEPS)
+                setLights(GREEN_PIN, g)
+                b = updateColor(b, 0.5 * STEPS)
+                setLights(BLUE_PIN, g)
+                if g >= 100:
+                    raiseColor = 0
+                    # print ("only r--")
+    else:                
+        setLights(RED_PIN, 0)
+        setLights(GREEN_PIN, 0)
+        setLights(BLUE_PIN, 0)
+        
+    
+    
 
-# if sensor detects motion, start mein_callback function to start ventilator and light strip 
-try:
-    GPIO.add_event_detect(SENSOR_PIN , GPIO.RISING, callback=mein_callback)
-    print ("\n waiting")
-    while True:
-        time.sleep(100)
-except KeyboardInterrupt:
-    print "Beende..."
-GPIO.cleanup()
-########### END PIR 
- 
-print ("Aborting...")
 
-setLights(RED_PIN, 0)
-setLights(GREEN_PIN, 0)
-setLights(BLUE_PIN, 0)
 
-time.sleep(0.5)
-
-pi.stop()#
 
 
 

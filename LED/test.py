@@ -1,5 +1,13 @@
 # import RPi.GPIO as GPIO
+import os
+#os.system("sudo pigpiod")
 
+import sys
+import termios
+import tty
+import pigpio
+import time
+from thread import start_new_thread
 #------------------------------------------------------------------------
 #Start importData Script
 #import database at localhost
@@ -16,18 +24,11 @@ db = MySQLdb.connect(host="localhost",    # your host, usually localhost
 #  you execute all the queries you need
 cur = db.cursor()
 
+
 #-------------------------------------------------------
+# Stop 
 
-# import RPi.GPIO as GPIO
-import os
-import sys
-import termios
-import tty
-import pigpio
-import time
-from thread import start_new_thread
 
-os.system("sudo pigpiod")
 
 
 
@@ -40,7 +41,7 @@ BLUE_PIN  = 24  # BLUE_PIN is on GPIO.PIN 24
 STEPS     = 0.05
 # execute terminal command and start pigpiod
 
-# Define colors
+
 bright = 40
 r = 0.0
 g = 0.0
@@ -69,6 +70,19 @@ def setLights(pin, brightness):
     realBrightness = int(int(brightness) * (float(bright) / 255.0))
     pi.set_PWM_dutycycle(pin, realBrightness)
 
+"""
+def getCh():
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    
+    try:
+        tty.setraw(fd)
+        ch = sys.stdin.read(1)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        
+    return ch
+
 
 def checkKey():
     global bright
@@ -78,6 +92,58 @@ def checkKey():
     global yellow
     global raiseColor
 
+    while True:
+        c = getCh()
+        
+        if c == '+' and bright < 255 and not brightChanged:
+            brightChanged = True
+            time.sleep(0.1)
+            brightChanged = False
+            
+            bright = bright + 0.1
+            print ("Current brightness: %d" % bright)
+            
+        if c == '-' and bright > 0 and not brightChanged:
+            brightChanged = True
+            time.sleep(0.1)
+            brightChanged = False
+            
+            bright = bright - 0.01
+            print ("Current brightness: %d" % bright)
+            
+        if c == 'p' and state:
+            state = False
+            print ("Pausing...")
+            
+            time.sleep(0.1)
+            setLights(RED_PIN, 0)
+            setLights(GREEN_PIN, 0)
+            
+        if c == 'w' and not state:
+            state = True
+            print ("weiter...")
+            
+        if c == 'y':
+            yellow = True
+            
+            print ("yellow = true")            
+        
+        if c == 'c' and not abort:
+            yellow = False
+            abort = True
+            break
+
+start_new_thread(checkKey, ())
+
+print ("+ / - = Increase / Decrease brightness")
+print ("p / w = Pause / weiter")
+print ("c = Abort Program")
+
+setLights(RED_PIN, r)
+setLights(GREEN_PIN, g)
+setLights(BLUE_PIN, b)
+
+"""
 raiseColor = 0
     
 def startLedStrip():
@@ -90,9 +156,7 @@ def startLedStrip():
     global r
     global g
     global b
-
-
-while True:
+    
     #make lightwave-effect for 5 secs
     t_end = time.time() + 5
     while time.time() < t_end:
@@ -127,28 +191,9 @@ while True:
                     # print ("only r--")
                     
     print ("\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 5 sec are over")
-    #setLights(RED_PIN, 0)
-    #setLights(GREEN_PIN, 0)
-    #setLights(BLUE_PIN, 0)
-
-    checkPlantState()
-
-
-def checkPlantState():
-     while round(time.time) % 5:
-        cur.execute("SELECT Status FROM anbau ORDER BY PrimKey DESC LIMIT 1")
-        # print all the first cell of all th rows
-        plantState = cur.fetchall()[0][0]
-        if plantState == "reif":
-            setGrowLight(True)
-            print ("Reif + Bewegung")
-            print ("==============================", plantState)
-        else:
-            setGrowLight(False)
-            print ("==============================", plantState)
-    
-
-   
+    setLights(RED_PIN, 0)
+    setLights(GREEN_PIN, 0)
+    setLights(BLUE_PIN, 0)
         
 ####################### VENTILATOR SCRIPT START
 def startVentilator(): 
@@ -174,7 +219,8 @@ def setGrowLight(not_active):
     GPIO.setmode(GPIO.BCM)
     ## spreche GPIO pin 15 an
     relais = 15
-    print('\n xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx stop growlight!')
+    #while round(time.time()) % 2 == 0:
+        #print('\n xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx stop growlight!')
     
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(relais, GPIO.OUT)
@@ -198,11 +244,38 @@ GPIO.setup(SENSOR_PIN, GPIO.IN)
 
 print ("\n Bereit")
 
+# reif = True
 
 
+# Use all the SQL you like
+#cur.execute("SELECT * FROM anbau")
 
-    
+cur.execute("SELECT Status FROM anbau ORDER BY PrimKey DESC LIMIT 1")
+
+# print all the first cell of all th rows
+plantState = cur.fetchall()[0][0]
+print ("==============================", plantState)
+
+def getPlantState():
+    while round(time.time()) % 5:
+        cur.execute("SELECT Status FROM anbau ORDER BY PrimKey DESC LIMIT 1")
+
+        # print all the first cell of all th rows
+        plantState = cur.fetchall()[0][0]
+        print ("==============================", plantState)
    
+start_new_thread(getPlantState, ())
+
+
+def checkPlantState():
+    while plantState == "reif":
+        setGrowLight(True)
+        print ("Reif + Bewegung")
+        print('\n Es gab eine Bewegung!')
+    else:
+        setGrowLight(False)
+        
+start_new_thread(checkPlantState, ())
 
 #if reif == True:
 #    start_new_thread(stopGrowLight, ())
