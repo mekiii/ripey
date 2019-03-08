@@ -1,3 +1,3 @@
 {
-    "python.pythonPath": "foodbot/bin/python2.7"
+    "python.pythonPath": "/usr/local/opt/python/bin/python3.6"
 }
