@@ -20,7 +20,7 @@ let urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 //Get slackclient
 const { WebClient } = require('@slack/client');
-const myToken = "xoxb-447711350823-540306733076-N10QKYzf4NqfRuDbaMg513NW";
+const myToken = "xoxb-447711350823-540306733076-HgFBTseTiF745bNADR91ANzh";
 const web = new WebClient(myToken);
 
 
