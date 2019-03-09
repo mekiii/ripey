@@ -22,6 +22,7 @@ t_end = 0
 t_led_end = 0
 
 #global reif
+#test
 
 db = MySQLdb.connect(host="localhost",    # your host, usually localhost
                      user="root",         # your username
