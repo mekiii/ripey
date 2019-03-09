@@ -184,8 +184,8 @@ GPIO.setup(SENSOR_PIN, GPIO.IN)
 print ("\n Bereit")
 
 def motionDetected(channel):
-    LEDisOn = True;
-    VentilatorisOn = True;
+    LEDisOn = True
+    VentilatorisOn = True
 
 
 while True:
@@ -210,8 +210,8 @@ while True:
     #DatabaseIsFetched = False
     
     if GPIO.input(SENSOR_PIN) == 1 and plantState =='reif':
-        VentilatorisOn = True;
-        LEDisOn = True;
+        VentilatorisOn = True
+        LEDisOn = True
     
     if VentilatorisOn == True:
         t_end = time.time() + 5
