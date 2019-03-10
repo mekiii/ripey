@@ -1,7 +1,5 @@
-# import RPi.GPIO as GPIO
 import os
 #os.system("sudo pigpiod")
-
 import sys
 import termios
 import tty
@@ -10,7 +8,6 @@ import time
 from thread import start_new_thread
 import RPi.GPIO as GPIO
 #------------------------------------------------------------------------
-#Start importData Script
 #import database at localhost
 import MySQLdb
 global plantState
@@ -21,19 +18,13 @@ DatabaseIsFetched = False
 t_end = 0
 t_led_end = 0
 
-#global reif
-#test
-
 db = MySQLdb.connect(host="localhost",    # your host, usually localhost
                      user="root",         # your username
                      passwd="runmysql",  # your password
                      db="planta")        # name of the data base
 
-# you must create a Cursor object. It will let
-#  you execute all the queries you need
+# create a Cursor object. It will let you execute all the queries you need
 cur = db.cursor()
-
-
 
 # DEFINE RASPBERRY PINS-----------------------------------------------------
 RED_PIN   = 17 # RED_PIN is on GPIO.PIN 17 
@@ -42,9 +33,6 @@ BLUE_PIN  = 24  # BLUE_PIN is on GPIO.PIN 24
 
 # Number of color changes per step (more is faster, less is slower). You also can use 0.X floats.
 STEPS     = 0.5
-# execute terminal command and start pigpiod
-
-
 bright = 40
 r = 0.0
 g = 0.0
@@ -73,8 +61,7 @@ def setLights(pin, brightness):
     realBrightness = int(int(brightness) * (float(bright) / 255.0))
     pi.set_PWM_dutycycle(pin, realBrightness)
 
-raiseColor = 0
-    
+   
 def startLedStrip():
     global bright
     global brightChanged
@@ -100,25 +87,21 @@ def startLedStrip():
                 setLights(GREEN_PIN, g)
                 b = updateColor(b, -0.5 * STEPS)
                 setLights(BLUE_PIN, g)
-                #print ("\n", r)
                 if g <= 5:
                     raiseColor = 1
-                    # print ("raiseColor = 1")
             #light go on
             if raiseColor == 1:
                 r = updateColor(r, STEPS)
                 setLights(RED_PIN, r)
                 r = updateColor(r, STEPS)
                 setLights(RED_PIN, r)
-                #print ("yellow =", r ,g)
                 g = updateColor(g, STEPS)
                 setLights(GREEN_PIN, g)
                 b = updateColor(b, 0.5 * STEPS)
                 setLights(BLUE_PIN, g)
                 if g >= 100:
                     raiseColor = 0
-                    # print ("only r--")
-                    
+    # turn led of again                
     print ("\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 5 sec are over")
     setLights(RED_PIN, 0)
     setLights(GREEN_PIN, 0)
@@ -126,8 +109,7 @@ def startLedStrip():
 
 
 
-
-####################### STOP GROWLIGHT SCRIPT START
+####################### setGrowlight START
 def setGrowLight(not_active): 
     #import RPi.GPIO as GPIO
     GPIO.setmode(GPIO.BCM)
@@ -146,16 +128,11 @@ def setGrowLight(not_active):
     else:
         print ("Growlight is OOOOOOOOON")
         GPIO.output(relais, GPIO.HIGH)   
-####################### STOP GROWLIGHT SCRIPT END
+####################### setGrowlight END
 
-
-
-# Use all the SQL you like
-#cur.execute("SELECT * FROM anbau")
-
+# select latest Status from Database
 cur.execute("SELECT Status FROM anbau ORDER BY PrimKey DESC LIMIT 1")
-
-# print all the first cell of all th rows
+# print all the first cell of all rows
 plantState = cur.fetchall()[0][0]
 print ("==============================", plantState)
 
@@ -163,12 +140,9 @@ def getPlantState():
     if round(time.time()) % 5 == 0 :
         cur.execute("SELECT Status FROM anbau ORDER BY PrimKey DESC LIMIT 1")
 
-        # print all the first cell of all th rows
         plantState = cur.fetchall()[0][0]
         print ("==============================", plantState)
    
-#start_new_thread(getPlantState, ())
-
 
 def checkPlantState():
     if plantState == "reif":
@@ -191,10 +165,6 @@ def motionDetected(channel):
 
 while True:
     
-    #if time.time()%1 == 0:
-        #DatabaseIsFetched = True
-        
-    #if DatabaseIsFetched == True:
     db = MySQLdb.connect(host="localhost",    # your host, usually localhost
                 user="root",         # your username
                 passwd="runmysql",  # your password
