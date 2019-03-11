@@ -39,10 +39,15 @@ setInterval(checkProduce, 10000);
 function checkProduce() {
 con.connect(function(err) {
     if (err) throw err;
-    con.query("SELECT * FROM anbau ORDER BY PrimKey DESC LIMIT 1", function (err, result, fields) {
+    con.query("SELECT * FROM anbau ORDER BY PrimKey DESC LIMIT 2", function (err, result, fields) {
       if (err) throw err;
-      if (result[0].Status == "reif") {
+      if (result[1].Status == "reif") {
         produceIsRipe = true;
+        //Send notification if last produce status was unripe
+        if(result[0].Status == "unreif")
+        {
+            sendNotification();
+        }
 	console.log("++++++++++++++++++++++++++++++++++++++++ produceIsRipe: " + produceIsRipe);
       }
       else {
