@@ -25,7 +25,7 @@ const web = new WebClient(myToken);
 
 
 //Prepare database connection 
-var con = mysql.createConnection({
+let con = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "runmysql",
@@ -33,13 +33,14 @@ var con = mysql.createConnection({
 });
 
 
-//Get information of ripeness database 
+//check if any produce is ripe for every 10 seconds
+setInterval(checkProduce, 10000);
 
+function checkProduce() {
 con.connect(function(err) {
     if (err) throw err;
     con.query("SELECT * FROM anbau ORDER BY PrimKey DESC LIMIT 1", function (err, result, fields) {
       if (err) throw err;
-      console.log("Database output (status): ");
       if (result[0].Status == "reif") {
         produceIsRipe = true;
 	console.log("++++++++++++++++++++++++++++++++++++++++ produceIsRipe: " + produceIsRipe);
@@ -50,7 +51,10 @@ con.connect(function(err) {
       }
     });
   });
+}
 
+
+//load some formatted messages for upcoming conversations
 async function loadJSON (jsonPath){
 
   var data = await fs.readFileAsync(jsonPath);
@@ -174,7 +178,7 @@ let channelInvitation;
     }
 })();
 
-//Get user information
+//Get user information of slack channel
 let userList = [];
 web.users.list({token: myToken})
 .then((res) => {
@@ -198,10 +202,10 @@ web.users.list({token: myToken})
             }  
         }
         //Set to random conversation ID
-        //var randomIndex = Math.floor((Math.random() * (userList.length - 1)));
+        //Declare second user in userlist as the chosen one (to send a recipe)
         user = userList[1];
         console.log(user.name + ": " + user.channel);
-        if( produceIsRipe) {
+        if(produceIsRipe) {
             sendNotification();
         }
     })
@@ -237,10 +241,12 @@ app.listen(3000, function () {
 //Post messages when server receives request
 app.post('/', urlencodedParser,(req,res) =>{
   res.status(200).end() // best practice to respond with empty 200 status code
-  var reqBody = req.body;
-  var actions = JSON.parse(reqBody.payload).actions;
-  var sendMessage = false;
+  let reqBody = req.body;
+  let actions = JSON.parse(reqBody.payload).actions;
+  let sendMessage = false;
   let zutatenBlock;
+  let message = [];
+  let myText = "Neue Nachricht";
 
     if(actions[0].selected_channel){
         selectedChannel = actions[0].selected_channel;
@@ -256,11 +262,10 @@ app.post('/', urlencodedParser,(req,res) =>{
 if (actions){
     clearInterval(timer);
     switch(actions[0].value){
-
-            case "shuffle":
-            // Shuffle recipes
+            //User pressed button to show recipes
+            case "shuffle" && produceIsRipe:
+            // switch to next recipe in list
             item = (item + 4) % recipeArray.length;
-            message = [];
             //Concat message
             message.push(recipeMessage[0]);
             message.push(recipeArray[item]);
@@ -270,9 +275,8 @@ if (actions){
             message.push(recipeMessage[1]);
             sendMessage = true;
             break;
-
+            //User selected a recipe
             case "select":
-            message = [];
             //Concat message
             message.push(chosenRecipes[item]);
             message.push(chosenRecipes[item + 1]);
@@ -280,24 +284,22 @@ if (actions){
             message.push(togetherMessage[1]);
             sendMessage = true;
             break;
-
+            //User decides to cancel lunch procedure
             case "quit":
             item = 0;
             message = cancelMessage;
             sendMessage = true;
             break;
-
+            //user decides to cook with others
             case "cook_together":
-            message = [];
             message.push(chosenRecipes[item]);
             message.push(chosenRecipes[item + 1]);
             message.push(channelSelection[0]);
             message.push(channelSelection[1]);
             sendMessage = true;
             break;
-
+            //User wants to cook alone
             case "cook_alone":
-            message = [];
             message.push(recipeArray[item + 1]);
             message.push(eatingAlone[0]);
             message.push(recipeArray[item]);
@@ -306,9 +308,9 @@ if (actions){
             message.push(recipeArray[item + 3]);
             sendMessage = true;
             break;
-
+            //User sent his information to channel
             case "send_to_channel":
-            message = [];
+            //format channel post as user
             message.push(recipeArray[item]);
             zutatenBlock = multiplier.getIngredients(zutaten,item/4, 1);
             message.push(zutatenBlock);
@@ -316,13 +318,14 @@ if (actions){
             channelInvitation[0].text.text += "\n Um " + selectedTime + " Uhr würden wir anfangen.";
             message.push(channelInvitation[0]);
             message.push(channelInvitation[1]);
+            //send channel post
             web.chat.postMessage({as_user: false, icon_url: 'https://ca.slack-edge.com/TD5LXAAQ7-UD6KHGA93-g52a4dea3649-72', channel: selectedChannel, text: channelInvitation[0].text.text, blocks: message, username: user.name,})
             .then((res) => {
                 // `res` contains information about the posted message
                 invitationTimeStamp = res.ts;
              })
             .catch(console.error);
-            message = [];
+            //Send response to user
             message.push(chosenRecipes[item]);
             message.push(chosenRecipes[item + 1]);
             channelSelection[0].text.text = "Dein Vorschlag wurde in deinen ausgewählten Kanal geschickt.\n Hier ist das Rezept:" 
@@ -332,18 +335,17 @@ if (actions){
             message.push(recipeArray[item + 3]);
             sendMessage = true;
             break;
-
+            //update post, when a user approves and multiply recipe
             case "user_selected":
             var newUser = JSON.parse(reqBody.payload).user.username;
             if (!approvingUsers.includes(newUser)){
                 approvingUsers.push(newUser);
-                message = [];
                 message.push(recipeArray[item]);
                 console.log("approvingUsers.length: " + approvingUsers.length);
                 zutatenBlock = multiplier.getIngredients(zutaten,item/4, approvingUsers.length +1 );
                 message.push(zutatenBlock);
                 message.push(recipeArray[item + 1]);
-                var lastIndex = approvingUsers.length - 1;
+                let lastIndex = approvingUsers.length - 1;
                     channelInvitation[2].text.text += "\n " + "*" + approvingUsers[lastIndex] + "*" +" ist dabei! :carrot:";
                 message.push(channelInvitation[0]);
                 message.push(channelInvitation[1]);
@@ -356,7 +358,7 @@ if (actions){
                 })
                 .catch(console.error);
             }
-            message = [];
+            //update recipe post of user
             message.push(chosenRecipes[item]);
             message.push(chosenRecipes[item + 1]);
             channelSelection[0].text.text = "Dein Vorschlag wurde in deinen ausgewählten Kanal geschickt.\n Hier ist das Rezept:" 
@@ -366,11 +368,16 @@ if (actions){
             message.push(recipeArray[item + 3]);
             sendMessage = true;
             break;  
+            default:
+            message = [];
+            myText ="Oh sieht so aus, als ob jemand schon was gepflückt hat. Vielleicht beim nächsten Mal :carrot:";
+            sendMessage = true;
+            break;
         }
     }
 
     if(sendMessage) {
-        web.chat.update({ channel: user.channel, text: "Here's a block", attachments: [], ts: timeStamp, blocks: message })
+        web.chat.update({ channel: user.channel, text: myText, attachments: [], ts: timeStamp, blocks: message })
         .then((res) => {
             // `res` contains information about the posted message
             console.log('Block message sent: ', res.ts);
