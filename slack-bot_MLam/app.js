@@ -11,7 +11,8 @@ let selectedTime;
 let approvingUsers =[];
 let user;
 let mysql = require('mysql');
-let produceIsRipe = true;
+let produceIsRipe = false;
+let conversationIsActive = false
 
 //Declare some variables
 let timeStamp;
@@ -20,23 +21,25 @@ let urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 //Get slackclient
 const { WebClient } = require('@slack/client');
-const myToken = "xoxb-575777238642-576133559221-73SKkVwRfVn7bJRfbRpvZRXp";
+const myToken = "xoxb-575777238642-576133559221-t8ZbmOVcKB1rqXQsIshbMXPq";
 const web = new WebClient(myToken);
 
 
 //Prepare database connection 
+
+
+
+//check if any produce is ripe for every 10 seconds
+setInterval(checkProduce, 5000);
+
+function checkProduce() {
 let con = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "runmysql",
   database: "planta"
-});
-
-
-//check if any produce is ripe for every 10 seconds
-setInterval(checkProduce, 10000);
-
-function checkProduce() {
+});   
+    
 con.connect(function(err) {
     if (err) throw err;
     con.query("SELECT * FROM anbau ORDER BY PrimKey DESC LIMIT 2", function (err, result, fields) {
@@ -44,8 +47,8 @@ con.connect(function(err) {
       if (result[1].Status == "reif") {
         produceIsRipe = true;
         //Send notification if last produce status was unripe
-        if(result[0].Status == "unreif")
-        {
+        if (conversationIsActive == false){
+            console.log("conversationIsActive" + conversationIsActive);
             sendNotification();
         }
 	console.log("++++++++++++++++++++++++++++++++++++++++ produceIsRipe: " + produceIsRipe);
@@ -186,14 +189,22 @@ let channelInvitation;
 
 //Get user information of slack channel
 let userList = [];
-web.users.list({token: myToken})
-.then((res) => {
+
+
+
+//First post ripeness notification
+function sendNotification(){
+    conversationIsActive = true;
+    web.users.list({token: myToken})
+    .then((res) => {
     // `res` contains information about the posted message
     for (i = 0; i < res.members.length; i++){
         if(res.members[i].is_bot == false && res.members[i].name != 'slackbot'){
             userList.push(res.members[i]);
         }  
     }
+    
+    console.log("CONVERSSATION");
 
     //Get get user Channel ID
     web.im.list({token: myToken})
@@ -211,19 +222,7 @@ web.users.list({token: myToken})
         //Declare second user in userlist as the chosen one (to send a recipe)
         user = userList[0];
         console.log(user.name + ": " + user.channel);
-        if(produceIsRipe) {
-            sendNotification();
-        }
-    })
-    .catch(console.error);
-})
-.catch(console.error);
-
-
-
-//First post ripeness notification
-function sendNotification(){
-    if(user.channel != null){
+            setTimeout(function(){conversationIsActive = false; console.log("TimeOut restarted")}, 60000);
         web.chat.postMessage({ channel: user.channel, text: "Hey es ist ganz viel Gemüse reif geworden! Hast du Lust auf einen Rezeptvorschlag?", attachments: [], blocks: notification })
         .then((res) => {
             // `res` contains information about the posted message
@@ -231,8 +230,13 @@ function sendNotification(){
             timeStamp = res.ts;
         })
         .catch(console.error);
-        //clearInterval(timer);
-    }
+    })
+    .catch(console.error);
+})
+.catch(console.error);
+
+        
+    
     
 }
 
@@ -267,7 +271,8 @@ app.post('/', urlencodedParser,(req,res) =>{
 
 //check what kind of action was triggered
 if (actions){
-    //clearInterval(timer);
+    conversationIsActive = true;
+    setTimeout(function(){conversationIsActive = false; console.log("TimeOut restarted")}, 60000);
     switch(actions[0].value){
             //User pressed button to show recipes
             case "shuffle":
