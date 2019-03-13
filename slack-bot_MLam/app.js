@@ -11,7 +11,7 @@ let selectedTime;
 let approvingUsers =[];
 let user;
 let mysql = require('mysql');
-let produceIsRipe = false;
+let produceIsRipe = true;
 
 //Declare some variables
 let timeStamp;
@@ -20,7 +20,7 @@ let urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 //Get slackclient
 const { WebClient } = require('@slack/client');
-const myToken = "xoxb-447711350823-540306733076-HgFBTseTiF745bNADR91ANzh";
+const myToken = "xoxb-575777238642-576133559221-73SKkVwRfVn7bJRfbRpvZRXp";
 const web = new WebClient(myToken);
 
 
@@ -57,6 +57,7 @@ con.connect(function(err) {
     });
   });
 }
+
 
 
 //load some formatted messages for upcoming conversations
@@ -208,7 +209,7 @@ web.users.list({token: myToken})
         }
         //Set to random conversation ID
         //Declare second user in userlist as the chosen one (to send a recipe)
-        user = userList[1];
+        user = userList[0];
         console.log(user.name + ": " + user.channel);
         if(produceIsRipe) {
             sendNotification();
@@ -248,6 +249,7 @@ app.post('/', urlencodedParser,(req,res) =>{
   res.status(200).end() // best practice to respond with empty 200 status code
   let reqBody = req.body;
   let actions = JSON.parse(reqBody.payload).actions;
+  console.log(actions[0].value);
   let sendMessage = false;
   let zutatenBlock;
   let message = [];
@@ -265,10 +267,10 @@ app.post('/', urlencodedParser,(req,res) =>{
 
 //check what kind of action was triggered
 if (actions){
-    clearInterval(timer);
+    //clearInterval(timer);
     switch(actions[0].value){
             //User pressed button to show recipes
-            case "shuffle" && produceIsRipe:
+            case "shuffle":
             // switch to next recipe in list
             item = (item + 4) % recipeArray.length;
             //Concat message
@@ -364,6 +366,7 @@ if (actions){
                 .catch(console.error);
             }
             //update recipe post of user
+            message = []
             message.push(chosenRecipes[item]);
             message.push(chosenRecipes[item + 1]);
             channelSelection[0].text.text = "Dein Vorschlag wurde in deinen ausgewählten Kanal geschickt.\n Hier ist das Rezept:" 
@@ -373,11 +376,12 @@ if (actions){
             message.push(recipeArray[item + 3]);
             sendMessage = true;
             break;  
-            default:
+            /*case undefined:
             message = [];
             myText ="Oh sieht so aus, als ob jemand schon was gepflückt hat. Vielleicht beim nächsten Mal :carrot:";
             sendMessage = true;
             break;
+            */
         }
     }
 
