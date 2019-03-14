@@ -21,12 +21,11 @@ let urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 //Get slackclient
 const { WebClient } = require('@slack/client');
-const myToken = "xoxb-575777238642-576133559221-t8ZbmOVcKB1rqXQsIshbMXPq";
+const myToken = "xoxb-575777238642-576133559221-ZzaQLTfVSAwywnvSjRI3G51k";
 const web = new WebClient(myToken);
 
 
 //Prepare database connection 
-
 
 
 //check if any produce is ripe for every 10 seconds
@@ -62,6 +61,7 @@ con.connect(function(err) {
 }
 
 
+sendNotification();
 
 //load some formatted messages for upcoming conversations
 async function loadJSON (jsonPath){
@@ -204,7 +204,7 @@ function sendNotification(){
         }  
     }
     
-    console.log("CONVERSSATION");
+    console.log("CONVERSATION");
 
     //Get get user Channel ID
     web.im.list({token: myToken})
@@ -258,6 +258,7 @@ app.post('/', urlencodedParser,(req,res) =>{
   let zutatenBlock;
   let message = [];
   let myText = "Neue Nachricht";
+  let channelMessage = [];
 
     if(actions[0].selected_channel){
         selectedChannel = actions[0].selected_channel;
@@ -323,15 +324,15 @@ if (actions){
             //User sent his information to channel
             case "send_to_channel":
             //format channel post as user
-            message.push(recipeArray[item]);
+            channelMessage.push(recipeArray[item]);
             zutatenBlock = multiplier.getIngredients(zutaten,item/4, 1);
-            message.push(zutatenBlock);
-            message.push(recipeArray[item + 1]);
+            channelMessage.push(zutatenBlock);
+            channelMessage.push(recipeArray[item + 1]);
             channelInvitation[0].text.text += "\n Um " + selectedTime + " Uhr würden wir anfangen.";
-            message.push(channelInvitation[0]);
-            message.push(channelInvitation[1]);
+            channelMessage.push(channelInvitation[0]);
+            channelMessage.push(channelInvitation[1]);
             //send channel post
-            web.chat.postMessage({as_user: false, icon_url: 'https://ca.slack-edge.com/TD5LXAAQ7-UD6KHGA93-g52a4dea3649-72', channel: selectedChannel, text: channelInvitation[0].text.text, blocks: message, username: user.name,})
+            web.chat.postMessage({as_user: false, icon_url: 'https://ca.slack-edge.com/TD5LXAAQ7-UD6KHGA93-g52a4dea3649-72', channel: selectedChannel, text: channelInvitation[0].text.text, blocks: channelMessage, username: user.name,})
             .then((res) => {
                 // `res` contains information about the posted message
                 invitationTimeStamp = res.ts;
@@ -352,19 +353,19 @@ if (actions){
             var newUser = JSON.parse(reqBody.payload).user.username;
             if (!approvingUsers.includes(newUser)){
                 approvingUsers.push(newUser);
-                message.push(recipeArray[item]);
+                channelMessage.push(recipeArray[item]);
                 console.log("approvingUsers.length: " + approvingUsers.length);
                 zutatenBlock = multiplier.getIngredients(zutaten,item/4, approvingUsers.length +1 );
-                message.push(zutatenBlock);
-                message.push(recipeArray[item + 1]);
+                channelMessage.push(zutatenBlock);
+                channelMessage.push(recipeArray[item + 1]);
                 let lastIndex = approvingUsers.length - 1;
-                    channelInvitation[2].text.text += "\n " + "*" + approvingUsers[lastIndex] + "*" +" ist dabei! :carrot:";
-                message.push(channelInvitation[0]);
-                message.push(channelInvitation[1]);
-                message.push(channelInvitation[2]);
+                channelInvitation[2].text.text += "\n " + "*" + approvingUsers[lastIndex] + "*" +" ist dabei! :carrot:";
+                channelMessage.push(channelInvitation[0]);
+                channelMessage.push(channelInvitation[1]);
+                channelMessage.push(channelInvitation[2]);
                 //update channel message
 
-                web.chat.update({ channel: selectedChannel, text: channelInvitation[0].text.text, attachments: [], ts: invitationTimeStamp, blocks: message })
+                web.chat.update({ channel: selectedChannel, text: channelInvitation[0].text.text, attachments: [], ts: invitationTimeStamp, blocks: channelMessage })
                 .then((res) => {
                     console.log('Block message sent: ', res.ts);
                 })

@@ -29,13 +29,13 @@
 		"type": "section",
 		"text": {
 			"type": "mrkdwn",
-			"text": "*Caprese Paninis*"
+			"text": "*Pesto Sandwich*"
 		}
 	},
 	{
 		"type": "image",
 		"image_url": "https://i.imgur.com/9hX2iGh.jpg",
-		"alt_text": "Caprese Paninis"
+		"alt_text": "Pesto Sandwich"
 	},
     {
 		"type": "section",
